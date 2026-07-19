@@ -1,0 +1,115 @@
+heirloom - a dead man's switch for Stellar accounts
+
+Sign one transaction today. If your account goes quiet for a period you choose,
+a recipient you named takes it over. Your assets never leave your account and no
+contract ever holds them.
+
+
+PROBLEM
+
+Self-custody has one unsolved failure mode: the key stops being available. The
+owner dies, or - far more often - simply loses access. This started personally:
+I lose wallets, repeatedly, and on-chain there is no lost-and-found.
+
+Existing answers all cost you something. Give a company your keys and you are no
+longer self-custodial. Give a person your seed phrase and they can rob you
+tonight. Deposit into a vault contract and your assets leave your control for
+code you have to trust.
+
+The recipient does not have to be someone else. It can be a fresh wallet you
+own: lose your keys, do nothing, and the account walks itself over to your new
+wallet. Inheritance is the emotional case; recovering from your own carelessness
+is the everyday one.
+
+
+WHY STELLAR
+
+CAP-21 preconditions, specifically minSeqAge: "valid only once this account has
+been untouched for N seconds." That turns a dead man's switch from an
+application into a network rule.
+
+On Ethereum a dead man's switch means depositing into a contract and trusting
+its code. Here the assets never move, so there is nothing to drain. The
+recipient holds a signed transaction that validators reject until the silence
+condition is met - so handing it to them costs nothing.
+
+minSeqAge is one of the least-used features in the protocol. I verified it on
+testnet before writing this rather than trusting the docs: 10 of 10 checks pass,
+including a real takeover (tx 1be159fb0867dbc8c0b73c3f5bd813e2d7b3c8eca20a1992d055c416d039c82f).
+
+
+TWO MODES
+
+The protocol supports two products, and the only difference is whether
+minSeqNum is set.
+
+Standing plan - stays armed indefinitely; ordinary activity only restarts the
+idle clock. Verified: 3 transactions, then silence, and the takeover succeeded.
+Cancelled deliberately, by bumping the sequence past the reserved slot.
+
+Sealed plan - one-shot; any transaction destroys it permanently. Verified: a
+single transaction and the takeover was rejected forever.
+
+Users must choose consciously. Standing is convenient but must be actively
+cancelled. Sealed is safer against a stale recipient but dies silently the
+moment you use your account.
+
+
+TARGET USERS
+
+Self-custody holders who have already lost a wallet once - the wedge, because
+the pitch needs no discussion of death, only "what happens if you lose your
+phone?" Then long-term holders and families unwilling to hand a seed phrase to a
+relative, and small teams needing continuity when a signer disappears.
+
+
+TECHNICAL ARCHITECTURE
+
+Frontend (Next.js): setup wizard, dashboard with idle countdown and an "I'm
+here" heartbeat, recipient view.
+
+Stellar layer, no custody: the takeover is a SetOptions transaction making the
+recipient a signer and setting master weight to 0, carrying minSeqAge (plus
+minSeqNum for standing plans). The heartbeat is any transaction. Cancelling is a
+BumpSequence past the reserved sequence slot.
+
+Soroban registry contract: plan metadata, recipient discovery, public countdown.
+It exists for discoverability, not custody - destroy it and every plan still
+works, because the recipient only needs their XDR.
+
+The signed XDR is not a secret. There is no server holding anything that could
+be leaked or coerced into releasing it early; the network does the refusing.
+
+
+COMPLEXITY
+
+Almost no production code uses minSeqAge, so correctness has to be proven
+against a live network. That is how I found that a brand-new account has
+seqTime = 0 and is treated as infinitely idle, letting a recipient claim
+instantly - so arming a plan must include an on-chain transaction.
+
+Other hard parts: pre-signed fees are fixed years in advance (fee-bump at claim
+time), recipients may hold zero XLM (fee sponsorship), cancellation must reach
+the reserved sequence number rather than merely exceed minSeqNum, and master
+weight 0 is irreversible.
+
+
+ROADMAP
+
+MVP on testnet: wallet, heartbeat and countdown, then the registry contract,
+then the full loop with both modes and CI running the proof on every commit.
+
+Acquisition: the story is the pitch. Starting with the people around me and
+Stellar community channels, with a demo that compresses the period to minutes so
+arming, heartbeat, a rejected early claim and a successful claim all fit in
+under two minutes.
+
+Mainnet: security review of the arming and cancellation paths first, since those
+are where a bug costs someone their account. Then conservative defaults, fee
+sponsorship so recipients never need funding, and multi-recipient splits.
+
+
+OUT OF SCOPE
+
+Death certificates, oracles, identity verification - the whole point is needing
+none. v1 also excludes percentage splits, legal will integration and KYC.
