@@ -1,5 +1,7 @@
 import {
+  getAddress,
   getNetwork,
+  isAllowed,
   isConnected,
   requestAccess,
 } from "@stellar/freighter-api";
@@ -71,6 +73,24 @@ export async function connectWallet(): Promise<ConnectResult> {
   }
 
   return { ok: true, address: access.address };
+}
+
+/**
+ * Restores a connection without prompting. Freighter remembers which sites it
+ * has allowed, so a returning visitor should not have to click through the
+ * extension again — but only Freighter can be trusted about that, never our own
+ * stored state. Returns null whenever access is not already granted.
+ */
+export async function restoreConnection(): Promise<string | null> {
+  if (!(await isFreighterInstalled())) return null;
+
+  const allowed = await isAllowed();
+  if (allowed.error || !allowed.isAllowed) return null;
+
+  const current = await getAddress();
+  if (current.error || !current.address) return null;
+
+  return current.address;
 }
 
 /** Wording shown to the user. Kept beside the errors so the two stay in step. */

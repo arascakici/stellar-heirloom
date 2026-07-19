@@ -1,42 +1,33 @@
 "use client";
 
-import { useState } from "react";
-
-import {
-  connectWallet,
-  describeWalletError,
-  type WalletError,
-} from "@/lib/wallet/freighter";
 import { network, shortenAddress } from "@/lib/stellar/network";
+import { describeWalletError } from "@/lib/wallet/freighter";
+import { useWallet } from "@/lib/wallet/WalletProvider";
 
 import styles from "./ConnectWallet.module.css";
 
 export function ConnectWallet() {
-  const [address, setAddress] = useState<string | null>(null);
-  const [error, setError] = useState<WalletError | null>(null);
-  const [busy, setBusy] = useState(false);
+  const { status, address, error, connect, disconnect } = useWallet();
 
-  async function handleConnect() {
-    setBusy(true);
-    setError(null);
-
-    const result = await connectWallet();
-    if (result.ok) {
-      setAddress(result.address);
-    } else {
-      setError(result.error);
-    }
-
-    setBusy(false);
+  // Say nothing until we know the answer, rather than guessing "disconnected".
+  if (status === "restoring") {
+    return <div className={styles.wrap} aria-busy="true" />;
   }
 
-  if (address) {
+  if (status === "connected" && address) {
     return (
       <div className={styles.connected}>
         <span className={styles.label}>Connected on {network.label}</span>
         <span className={`${styles.address} mono`} title={address}>
           {shortenAddress(address, 6)}
         </span>
+        <button type="button" className={styles.quiet} onClick={disconnect}>
+          Disconnect
+        </button>
+        <p className={styles.aside}>
+          This ends the session here. Freighter keeps its own record of sites it
+          trusts — remove heirloom there to revoke it completely.
+        </p>
       </div>
     );
   }
@@ -46,10 +37,10 @@ export function ConnectWallet() {
       <button
         type="button"
         className={styles.button}
-        onClick={handleConnect}
-        disabled={busy}
+        onClick={connect}
+        disabled={status === "connecting"}
       >
-        {busy ? "Waiting for Freighter…" : "Connect wallet"}
+        {status === "connecting" ? "Waiting for Freighter…" : "Connect wallet"}
       </button>
 
       {error && (

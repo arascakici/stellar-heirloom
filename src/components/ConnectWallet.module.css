@@ -61,6 +61,29 @@
   border-radius: var(--radius-sm);
 }
 
+/* Secondary action: engraved into the wood rather than fitted in brass. */
+.quiet {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 0.25em;
+}
+
+.quiet:hover {
+  color: var(--text);
+}
+
+.aside {
+  max-width: 24rem;
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--text-faint);
+  text-wrap: pretty;
+}
+
 .error {
   max-width: 28rem;
   font-size: var(--text-sm);
