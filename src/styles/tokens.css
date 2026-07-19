@@ -1,0 +1,99 @@
+/*
+ * heirloom design tokens.
+ *
+ * The product is a chest. Dark wood, brass fittings, a patina that only comes
+ * from age. Everything here serves that one image, because the chest is not
+ * decoration — it is the mechanism drawn literally. A closed chest shows you
+ * its contents and refuses to let you touch them, which is exactly what the
+ * chain does to a takeover transaction before its time.
+ *
+ * Deliberately dark-only. A palette that works in both light and dark ends up
+ * committing to neither.
+ */
+
+:root {
+  /* Wood — the body of the chest, darkest at the bottom of the grain. */
+  --wood-950: #100b07;
+  --wood-900: #17110c;
+  --wood-800: #201810;
+  --wood-700: #2b2117;
+  --wood-600: #3a2d20;
+  --wood-500: #4d3c2b;
+
+  /* Brass — hinges, locks, the one thing that catches light. */
+  --brass-600: #8a6224;
+  --brass-500: #b3812f;
+  --brass-400: #c99a45;
+  --brass-300: #e0b86e;
+
+  /* Patina — the green of aged copper. Reserved for "still alive". */
+  --patina-600: #3d6b5d;
+  --patina-500: #558d7b;
+  --patina-400: #74ad99;
+
+  /* Rust — irreversible and dangerous. Used sparingly, and never for polish. */
+  --rust-600: #7a3022;
+  --rust-500: #9c4331;
+  --rust-400: #c05f48;
+
+  /* Parchment — everything written on or in the chest. */
+  --parchment-100: #f2e9da;
+  --parchment-200: #ded1bd;
+  --parchment-300: #b8a68d;
+  --parchment-400: #8a7a64;
+  --parchment-500: #6b5d4c;
+
+  /* Semantic aliases — components reference these, never the raw ramps. */
+  --surface: var(--wood-900);
+  --surface-raised: var(--wood-800);
+  --surface-inset: var(--wood-950);
+  --border: var(--wood-600);
+  --border-strong: var(--wood-500);
+
+  --text: var(--parchment-100);
+  --text-muted: var(--parchment-300);
+  --text-faint: var(--parchment-500);
+
+  --accent: var(--brass-500);
+  --accent-bright: var(--brass-300);
+  --alive: var(--patina-500);
+  --danger: var(--rust-500);
+
+  /* Type. Families come from next/font in the root layout. */
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-body: var(--font-newsreader), Georgia, serif;
+  --font-mono: var(--font-mono-face), ui-monospace, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.5rem;
+  --text-3xl: 3.5rem;
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+
+  /* Space — 4px base. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  /* Corners stay tight. Brass fittings are cut, not moulded. */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+
+  /* A lid casts a real shadow. */
+  --shadow-lid: 0 18px 40px -12px rgb(0 0 0 / 0.75);
+  --shadow-inset: inset 0 1px 0 rgb(255 255 255 / 0.04);
+
+  /* Grain, generated rather than shipped as an image. */
+  --texture-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
