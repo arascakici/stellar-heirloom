@@ -1,3 +1,5 @@
+import { ConnectWallet } from "@/components/ConnectWallet";
+
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -15,6 +17,9 @@ export default function Home() {
           one — including us — can move them early. The network itself does the
           refusing.
         </p>
+        <div className={styles.action}>
+          <ConnectWallet />
+        </div>
       </div>
     </main>
   );

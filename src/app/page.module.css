@@ -56,6 +56,12 @@
   text-wrap: pretty;
 }
 
+.action {
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+}
+
 @media (max-width: 32rem) {
   .plate {
     padding: var(--space-6) var(--space-5);

@@ -1,0 +1,69 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* Brass, machined: a raised edge above, a shadow below. */
+.button {
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  letter-spacing: 0.02em;
+  color: var(--wood-950);
+  background-image: linear-gradient(
+    to bottom,
+    var(--brass-400),
+    var(--brass-600)
+  );
+  border: 1px solid var(--brass-600);
+  border-radius: var(--radius-sm);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    0 2px 6px rgb(0 0 0 / 0.4);
+  transition: filter 120ms ease;
+}
+
+.button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.button:active:not(:disabled) {
+  box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.35);
+}
+
+.button:disabled {
+  cursor: progress;
+  filter: saturate(0.5) brightness(0.85);
+}
+
+.connected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.address {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--accent-bright);
+  background-color: var(--surface-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.error {
+  max-width: 28rem;
+  font-size: var(--text-sm);
+  color: var(--rust-400);
+  text-wrap: pretty;
+}
