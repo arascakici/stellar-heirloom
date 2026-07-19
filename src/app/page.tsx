@@ -1,3 +1,4 @@
+import { Balance } from "@/components/Balance";
 import { ConnectWallet } from "@/components/ConnectWallet";
 
 import styles from "./page.module.css";
@@ -19,6 +20,7 @@ export default function Home() {
         </p>
         <div className={styles.action}>
           <ConnectWallet />
+          <Balance />
         </div>
       </div>
     </main>
