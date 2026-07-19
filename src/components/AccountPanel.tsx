@@ -1,0 +1,44 @@
+"use client";
+
+import { useBalance } from "@/lib/stellar/useBalance";
+import { useWallet } from "@/lib/wallet/WalletProvider";
+
+import { Balance } from "./Balance";
+import { FundAccount } from "./FundAccount";
+import styles from "./AccountPanel.module.css";
+
+/**
+ * Owns the one reading of the account that everything else reacts to. Funding
+ * and, later, the heartbeat both refresh through here, so the balance on
+ * screen is never left disagreeing with what just happened.
+ */
+export function AccountPanel() {
+  const { address } = useWallet();
+  const { balance, loading, refreshing, error, refresh } = useBalance(address);
+
+  if (!address) return null;
+
+  if (loading) {
+    return <p className={styles.status}>Reading the ledger…</p>;
+  }
+
+  if (error) {
+    return (
+      <p className={styles.status} role="alert">
+        {error}
+      </p>
+    );
+  }
+
+  if (!balance) return null;
+
+  return (
+    <div className={styles.panel}>
+      {balance.funded ? (
+        <Balance balance={balance} refreshing={refreshing} />
+      ) : (
+        <FundAccount address={address} onFunded={refresh} />
+      )}
+    </div>
+  );
+}

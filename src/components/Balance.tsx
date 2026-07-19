@@ -1,41 +1,23 @@
 "use client";
 
 import { formatXlm } from "@/lib/stellar/amount";
-import { useBalance } from "@/lib/stellar/useBalance";
-import { useWallet } from "@/lib/wallet/WalletProvider";
+import type { AccountBalance } from "@/lib/stellar/balance";
 
 import styles from "./Balance.module.css";
 
-export function Balance() {
-  const { address } = useWallet();
-  const { balance, loading, error } = useBalance(address);
-
-  if (!address) return null;
-
-  if (loading && !balance) {
-    return <p className={styles.status}>Reading the ledger…</p>;
-  }
-
-  if (error) {
-    return (
-      <p className={styles.status} role="alert">
-        {error}
-      </p>
-    );
-  }
-
-  if (!balance) return null;
-
-  if (!balance.funded) {
-    return (
-      <p className={styles.status}>
-        This account holds nothing yet — it has never been funded.
-      </p>
-    );
-  }
-
+/**
+ * Presentational: the panel above owns the reading, so that funding and the
+ * heartbeat can refresh the same figure rather than each keeping their own.
+ */
+export function Balance({
+  balance,
+  refreshing,
+}: {
+  balance: Extract<AccountBalance, { funded: true }>;
+  refreshing: boolean;
+}) {
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} data-refreshing={refreshing || undefined}>
       <p className={styles.figure}>
         <span className={`${styles.amount} mono`}>
           {formatXlm(balance.total)}
@@ -44,10 +26,9 @@ export function Balance() {
       </p>
       <p className={styles.breakdown}>
         <span className="mono">{formatXlm(balance.reserved)}</span> held in
-        reserve by the network — <span className="mono">
-          {formatXlm(balance.available)}
-        </span>{" "}
-        can pay fees.
+        reserve by the network —{" "}
+        <span className="mono">{formatXlm(balance.available)}</span> can pay
+        fees.
       </p>
     </div>
   );
