@@ -5,6 +5,7 @@ import { useWallet } from "@/lib/wallet/WalletProvider";
 
 import { Balance } from "./Balance";
 import { FundAccount } from "./FundAccount";
+import { Heartbeat } from "./Heartbeat";
 import styles from "./AccountPanel.module.css";
 
 /**
@@ -35,7 +36,10 @@ export function AccountPanel() {
   return (
     <div className={styles.panel}>
       {balance.funded ? (
-        <Balance balance={balance} refreshing={refreshing} />
+        <>
+          <Balance balance={balance} refreshing={refreshing} />
+          <Heartbeat address={address} onSent={refresh} />
+        </>
       ) : (
         <FundAccount address={address} onFunded={refresh} />
       )}

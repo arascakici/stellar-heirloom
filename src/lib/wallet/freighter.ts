@@ -4,6 +4,7 @@ import {
   isAllowed,
   isConnected,
   requestAccess,
+  signTransaction,
 } from "@stellar/freighter-api";
 
 import { network } from "../stellar/network";
@@ -91,6 +92,33 @@ export async function restoreConnection(): Promise<string | null> {
   if (current.error || !current.address) return null;
 
   return current.address;
+}
+
+export type SignResult =
+  | { ok: true; signedXdr: string }
+  | { ok: false; error: WalletError };
+
+/**
+ * Signing is where a person is asked to approve something, so declining is an
+ * ordinary outcome rather than an exception — it is the wallet working.
+ */
+export async function signXdr(
+  xdr: string,
+  address: string,
+): Promise<SignResult> {
+  const result = await signTransaction(xdr, {
+    networkPassphrase: network.passphrase,
+    address,
+  });
+
+  if (result.error) {
+    return { ok: false, error: classify(String(result.error)) };
+  }
+  if (!result.signedTxXdr) {
+    return { ok: false, error: { kind: "rejected" } };
+  }
+
+  return { ok: true, signedXdr: result.signedTxXdr };
 }
 
 /** Wording shown to the user. Kept beside the errors so the two stay in step. */
