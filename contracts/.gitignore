@@ -4,3 +4,6 @@ target
 # Local settings
 .soroban
 .stellar
+
+# Regenerated on every `cargo test` run
+test_snapshots
