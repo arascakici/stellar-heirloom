@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 
-import { network, shortenAddress } from "@/lib/stellar/network";
 import { describeWalletError } from "@/lib/wallet/kit";
 import { useWallet } from "@/lib/wallet/WalletProvider";
 
+import { AccountMenu } from "./AccountMenu";
 import { WalletPicker } from "./WalletPicker";
 import styles from "./ConnectWallet.module.css";
 
 export function ConnectWallet() {
-  const { status, address, error, connect, disconnect } = useWallet();
+  const { status, error, connect } = useWallet();
   const [open, setOpen] = useState(false);
 
   const connecting = status === "connecting";
@@ -43,24 +43,8 @@ export function ConnectWallet() {
     return <div className={styles.slot} aria-busy="true" />;
   }
 
-  if (status === "connected" && address) {
-    return (
-      <div className={styles.pill}>
-        <span className={styles.dot} aria-hidden />
-        <span className={styles.net}>{network.label}</span>
-        <span className={`${styles.address} mono`} title={address}>
-          {shortenAddress(address, 4)}
-        </span>
-        <button
-          type="button"
-          className={styles.disconnect}
-          onClick={disconnect}
-          title="Ends the session here. Your wallet keeps its own record of trusted sites — remove heirloom there to revoke it completely."
-        >
-          Disconnect
-        </button>
-      </div>
-    );
+  if (status === "connected") {
+    return <AccountMenu />;
   }
 
   return (

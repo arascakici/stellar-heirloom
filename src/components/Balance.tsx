@@ -12,12 +12,18 @@ import styles from "./Balance.module.css";
 export function Balance({
   balance,
   refreshing,
+  compact = false,
 }: {
   balance: Extract<AccountBalance, { funded: true }>;
   refreshing: boolean;
+  /** Smaller, for the account menu rather than a page centrepiece. */
+  compact?: boolean;
 }) {
   return (
-    <div className={styles.wrap} data-refreshing={refreshing || undefined}>
+    <div
+      className={`${styles.wrap} ${compact ? styles.compact : ""}`}
+      data-refreshing={refreshing || undefined}
+    >
       <p className={styles.figure}>
         <span className={`${styles.amount} mono`}>
           {formatXlm(balance.total)}
@@ -25,10 +31,9 @@ export function Balance({
         <span className={styles.unit}>XLM</span>
       </p>
       <p className={styles.breakdown}>
-        <span className="mono">{formatXlm(balance.reserved)}</span> held in
-        reserve by the network —{" "}
         <span className="mono">{formatXlm(balance.available)}</span> can pay
-        fees.
+        fees ·{" "}
+        <span className="mono">{formatXlm(balance.reserved)}</span> in reserve.
       </p>
     </div>
   );

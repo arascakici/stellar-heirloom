@@ -28,52 +28,6 @@
   filter: brightness(1.08);
 }
 
-/* Connected identity, in glass: it belongs to the bar, not the page. */
-.pill {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  background-color: rgb(38 30 21 / 0.5);
-  backdrop-filter: blur(10px) saturate(120%);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
-  border: 1px solid rgb(201 154 69 / 0.22);
-  border-radius: 999px;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
-}
-
-.dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background-color: var(--brass-300);
-  box-shadow: 0 0 6px rgb(201 154 69 / 0.6);
-}
-
-.net {
-  font-size: var(--text-xs);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
-.address {
-  font-size: var(--text-sm);
-  color: var(--accent-bright);
-}
-
-.disconnect {
-  padding-left: var(--space-3);
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  border-left: 1px solid var(--border-strong);
-  transition: color 120ms ease;
-}
-
-.disconnect:hover {
-  color: var(--rust-400);
-}
-
 /* The room dims; the chest is lifted to the front. */
 .overlay {
   position: fixed;

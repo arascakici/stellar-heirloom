@@ -35,16 +35,17 @@ export function Heartbeat({ address, onSent }: Props) {
         onClick={handleSend}
         disabled={sending}
       >
-        {sending ? "Signing…" : "I’m here"}
+        {sending ? "Winding…" : "Wind the clock"}
       </button>
 
       <p className={styles.explain}>
-        Sends one stroop to yourself. Nothing leaves the account but the fee —
-        the point is the record, which restarts the clock your plan is measured
-        against.
+        A one-stroop note to yourself — nothing leaves but the fee. It winds back
+        the clock your plan counts down against.
       </p>
 
-      {result && <TransactionResult outcome={result} successLabel="Recorded." />}
+      {result && (
+        <TransactionResult outcome={result} successLabel="Clock wound." />
+      )}
     </div>
   );
 }

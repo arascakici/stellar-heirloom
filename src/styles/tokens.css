@@ -26,10 +26,13 @@
   --brass-400: #c99a45;
   --brass-300: #e0b86e;
 
-  /* Patina — the green of aged copper. Reserved for "still alive". */
-  --patina-600: #3d6b5d;
-  --patina-500: #558d7b;
-  --patina-400: #74ad99;
+  /* Patina — the green of aged copper. Reserved for "still alive".
+   * Deep and desaturated: oxidised bronze in shadow, not a bright green slab.
+   * The parchment label carries the contrast, so this can sit right down in the
+   * wood. */
+  --patina-600: #2c3a32;
+  --patina-500: #3a4e43;
+  --patina-400: #6b8574;
 
   /* Rust — irreversible and dangerous. Used sparingly, and never for polish. */
   --rust-600: #7a3022;

@@ -39,6 +39,20 @@
   text-wrap: pretty;
 }
 
+/* In the menu the balance is a readout, not the hero — bring it down to size. */
+.compact {
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.compact .amount {
+  font-size: var(--text-lg);
+}
+
+.compact .breakdown {
+  text-align: left;
+}
+
 .status {
   font-size: var(--text-sm);
   color: var(--text-muted);

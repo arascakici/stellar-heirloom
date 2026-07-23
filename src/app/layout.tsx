@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, JetBrains_Mono, Newsreader } from "next/font/google";
 import { TopBar } from "@/components/TopBar";
+import { BalanceProvider } from "@/lib/stellar/BalanceProvider";
 import { WalletProvider } from "@/lib/wallet/WalletProvider";
 
 import "./globals.css";
@@ -47,8 +48,10 @@ export default function RootLayout({
     >
       <body>
         <WalletProvider>
-          <TopBar />
-          {children}
+          <BalanceProvider>
+            <TopBar />
+            {children}
+          </BalanceProvider>
         </WalletProvider>
       </body>
     </html>

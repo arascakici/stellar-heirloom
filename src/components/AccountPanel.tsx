@@ -1,27 +1,23 @@
 "use client";
 
-import { useBalance } from "@/lib/stellar/useBalance";
+import { useAccountBalance } from "@/lib/stellar/BalanceProvider";
 import { useWallet } from "@/lib/wallet/WalletProvider";
 
-import { Balance } from "./Balance";
 import { FundAccount } from "./FundAccount";
-import { Heartbeat } from "./Heartbeat";
 import { PlanSetup } from "./PlanSetup";
 import styles from "./AccountPanel.module.css";
 
 /**
- * Owns the one reading of the account that everything else reacts to. Funding
- * and, later, the heartbeat both refresh through here, so the balance on
- * screen is never left disagreeing with what just happened.
+ * The centre of the page is about the plan. The account itself — balance,
+ * heartbeat, disconnect — lives in the menu up top; here we only get in the way
+ * of funding an empty account, then naming an heir.
  */
 export function AccountPanel() {
   const { address } = useWallet();
-  const { balance, loading, refreshing, error, refresh } = useBalance(address);
+  const { balance, loading, refreshing, error, refresh } = useAccountBalance();
 
   if (!address) {
-    return (
-      <p className={styles.prompt}>Connect your wallet above to begin.</p>
-    );
+    return <p className={styles.prompt}>Connect your wallet above to begin.</p>;
   }
 
   if (loading) {
@@ -49,11 +45,7 @@ export function AccountPanel() {
   return (
     <div className={styles.panel}>
       {balance.funded ? (
-        <>
-          <Balance balance={balance} refreshing={refreshing} />
-          <Heartbeat address={address} onSent={refresh} />
-          <PlanSetup owner={address} onSealed={refresh} />
-        </>
+        <PlanSetup owner={address} onSealed={refresh} />
       ) : (
         <FundAccount address={address} onFunded={refresh} />
       )}
