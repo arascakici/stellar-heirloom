@@ -88,16 +88,31 @@ export type SignResult =
   | { ok: true; signedXdr: string }
   | { ok: false; error: WalletError };
 
+/**
+ * The kit rejects with plain objects ({ code, message, ext }), not Error
+ * instances, so `String(error)` would give "[object Object]". Dig the real
+ * message out wherever it is.
+ */
+function messageOf(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object" && "message" in error) {
+    return String((error as { message: unknown }).message);
+  }
+  return String(error ?? "");
+}
+
 /** The wallets differ in how they phrase refusal; match on intent. */
 function isRefusal(message: string): boolean {
   return /declin|reject|denied|cancel/i.test(message);
 }
 
 function classify(error: unknown): WalletError {
-  const message =
-    error instanceof Error ? error.message : String(error ?? "");
+  const message = messageOf(error);
   if (isRefusal(message)) return { kind: "rejected" };
-  return { kind: "unknown", message: message || "Your wallet could not complete that." };
+  return {
+    kind: "unknown",
+    message: message || "Your wallet could not complete that.",
+  };
 }
 
 /** The list to render in our own picker, newest availability each time. */
@@ -140,7 +155,9 @@ export async function connectWallet(walletId: string): Promise<ConnectResult> {
   const k = await kit();
   try {
     k.setWallet(walletId);
-    const { address } = await k.getAddress();
+    // fetchAddress actively asks the wallet (prompting for access); getAddress
+    // only reads the kit's memory, which is empty until something connects.
+    const { address } = await k.fetchAddress();
     if (!address) return { ok: false, error: { kind: "rejected" } };
 
     const mismatch = await networkMismatch(k);
