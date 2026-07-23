@@ -6,6 +6,7 @@ import { useWallet } from "@/lib/wallet/WalletProvider";
 import { Balance } from "./Balance";
 import { FundAccount } from "./FundAccount";
 import { Heartbeat } from "./Heartbeat";
+import { PlanSetup } from "./PlanSetup";
 import styles from "./AccountPanel.module.css";
 
 /**
@@ -47,6 +48,7 @@ export function AccountPanel() {
         <>
           <Balance balance={balance} refreshing={refreshing} />
           <Heartbeat address={address} onSent={refresh} />
+          <PlanSetup owner={address} onSealed={refresh} />
         </>
       ) : (
         <FundAccount address={address} onFunded={refresh} />
