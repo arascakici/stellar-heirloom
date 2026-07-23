@@ -25,9 +25,17 @@ export function AccountPanel() {
 
   if (error) {
     return (
-      <p className={styles.status} role="alert">
-        {error}
-      </p>
+      <div className={styles.errorBox} role="alert">
+        <p className={styles.status}>{error}</p>
+        <button
+          type="button"
+          className={styles.retry}
+          onClick={refresh}
+          disabled={refreshing}
+        >
+          {refreshing ? "Retrying…" : "Try again"}
+        </button>
+      </div>
     );
   }
 

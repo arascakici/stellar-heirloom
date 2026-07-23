@@ -10,3 +10,38 @@
   font-size: var(--text-sm);
   color: var(--text-muted);
 }
+
+.errorBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/*
+ * A read failure is the network's fault, not the account's, so the way out is
+ * to try again rather than to reload and lose the session. Iron, not brass —
+ * this recovers from trouble, it doesn't invite an action.
+ */
+.retry {
+  padding: var(--space-2) var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--parchment-200);
+  background-color: var(--wood-800);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.retry:hover:not(:disabled) {
+  border-color: var(--brass-400);
+  background-color: var(--wood-700);
+}
+
+.retry:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
