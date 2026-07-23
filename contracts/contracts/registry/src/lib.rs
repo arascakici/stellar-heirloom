@@ -59,6 +59,8 @@ pub enum DataKey {
 pub enum Error {
     PlanExists = 1,
     InvalidPeriod = 2,
+    NoPlan = 3,
+    NotActive = 4,
 }
 
 /// Emitted when a plan is recorded. Topics: `registered`, owner, heir — so an
@@ -73,11 +75,44 @@ pub struct Registered {
     pub mode: Mode,
 }
 
+/// Emitted on every sign of life. Topics: `heartbeat`, owner — the heir watches
+/// this to know the clock just reset.
+#[contractevent]
+pub struct Heartbeat {
+    #[topic]
+    pub owner: Address,
+    pub last_seen: u64,
+}
+
+/// Emitted when an owner calls off their plan. Topics: `cancelled`, owner, heir.
+#[contractevent]
+pub struct Cancelled {
+    #[topic]
+    pub owner: Address,
+    #[topic]
+    pub heir: Address,
+}
+
 // Persistent entries expire; keep a plan alive for a generous window so a demo
 // (or a patient owner) does not lose it between heartbeats. ~30 days of ledgers
 // at roughly five seconds each.
 const DAY_LEDGERS: u32 = 17_280;
 const PLAN_TTL: u32 = DAY_LEDGERS * 30;
+
+/// Load an owner's plan, insisting it exists and is still in force. The two
+/// error cases are kept apart so the caller can tell "you never had a plan"
+/// from "your plan is already cancelled".
+fn load_active(env: &Env, owner: &Address) -> Result<Plan, Error> {
+    let plan: Plan = env
+        .storage()
+        .persistent()
+        .get(&DataKey::Plan(owner.clone()))
+        .ok_or(Error::NoPlan)?;
+    if !matches!(plan.status, Status::Active) {
+        return Err(Error::NotActive);
+    }
+    Ok(plan)
+}
 
 #[contract]
 pub struct Registry;
@@ -142,6 +177,49 @@ impl Registry {
             heir,
             period,
             mode,
+        }
+        .publish(&env);
+
+        Ok(())
+    }
+
+    /// A sign of life: reset the idle clock the plan is measured against. Only
+    /// the owner can send it, and only while the plan is active.
+    pub fn heartbeat(env: Env, owner: Address) -> Result<(), Error> {
+        owner.require_auth();
+
+        let mut plan = load_active(&env, &owner)?;
+        let now = env.ledger().timestamp();
+        plan.last_seen = now;
+
+        let key = DataKey::Plan(owner.clone());
+        env.storage().persistent().set(&key, &plan);
+        env.storage().persistent().extend_ttl(&key, PLAN_TTL, PLAN_TTL);
+
+        Heartbeat {
+            owner,
+            last_seen: now,
+        }
+        .publish(&env);
+
+        Ok(())
+    }
+
+    /// Call off a plan. The record is kept but marked cancelled, so the heir
+    /// index stays consistent and the history remains readable.
+    pub fn cancel(env: Env, owner: Address) -> Result<(), Error> {
+        owner.require_auth();
+
+        let mut plan = load_active(&env, &owner)?;
+        plan.status = Status::Cancelled;
+
+        let key = DataKey::Plan(owner.clone());
+        env.storage().persistent().set(&key, &plan);
+        env.storage().persistent().extend_ttl(&key, PLAN_TTL, PLAN_TTL);
+
+        Cancelled {
+            owner,
+            heir: plan.heir,
         }
         .publish(&env);
 
