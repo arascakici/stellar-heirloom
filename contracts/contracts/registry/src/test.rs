@@ -182,3 +182,54 @@ fn plans_for_heir_drops_a_stale_index_entry() {
     assert_eq!(client.plans_for_heir(&heir_a).len(), 0);
     assert_eq!(client.plans_for_heir(&heir_b).len(), 1);
 }
+
+// require_auth is the entire security model — a plan may only be changed by its
+// owner. mock_all_auths lets every call through but still records what was
+// required, so env.auths() proves the owner's signature was demanded each time.
+
+#[test]
+fn register_requires_owner_auth() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let client = setup(&env);
+
+    let owner = Address::generate(&env);
+    let heir = Address::generate(&env);
+
+    client.register(&owner, &heir, &1_000u64, &Mode::Standing);
+    let auths = env.auths();
+    assert_eq!(auths.len(), 1);
+    assert_eq!(auths[0].0, owner);
+}
+
+#[test]
+fn heartbeat_requires_owner_auth() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let client = setup(&env);
+
+    let owner = Address::generate(&env);
+    let heir = Address::generate(&env);
+
+    client.register(&owner, &heir, &1_000u64, &Mode::Standing);
+    client.heartbeat(&owner);
+    let auths = env.auths();
+    assert_eq!(auths.len(), 1);
+    assert_eq!(auths[0].0, owner);
+}
+
+#[test]
+fn cancel_requires_owner_auth() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let client = setup(&env);
+
+    let owner = Address::generate(&env);
+    let heir = Address::generate(&env);
+
+    client.register(&owner, &heir, &1_000u64, &Mode::Standing);
+    client.cancel(&owner);
+    let auths = env.auths();
+    assert_eq!(auths.len(), 1);
+    assert_eq!(auths[0].0, owner);
+}
