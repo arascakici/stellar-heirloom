@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { sendHeartbeat, type HeartbeatResult } from "@/lib/stellar/heartbeat";
 
+import { TransactionResult } from "./TransactionResult";
 import styles from "./Heartbeat.module.css";
 
 type Props = {
@@ -43,19 +44,7 @@ export function Heartbeat({ address, onSent }: Props) {
         against.
       </p>
 
-      {result?.ok && (
-        <p className={styles.sent}>
-          Recorded. <span className="mono">{result.hash.slice(0, 12)}…</span>
-        </p>
-      )}
-
-      {result && !result.ok && (
-        <p className={styles.failed} role="alert">
-          {result.reason.kind === "declined"
-            ? "You declined the signature, so nothing was sent."
-            : "That did not go through."}
-        </p>
-      )}
+      {result && <TransactionResult outcome={result} successLabel="Recorded." />}
     </div>
   );
 }

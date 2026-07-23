@@ -9,6 +9,7 @@ import {
 import { horizon } from "./horizon";
 import { network } from "./network";
 import { fromStroops } from "./amount";
+import type { TxFailureReason, TxOutcome } from "./outcome";
 import { signXdr } from "../wallet/freighter";
 
 /**
@@ -25,15 +26,9 @@ const ONE_STROOP = fromStroops(1n);
 /** Marks the transaction as a heartbeat so it can be told apart on chain. */
 const MEMO = "heirloom:here";
 
-export type HeartbeatResult =
-  | { ok: true; hash: string }
-  | { ok: false; reason: HeartbeatFailure };
-
-export type HeartbeatFailure =
-  | { kind: "declined" }
-  | { kind: "insufficient-funds" }
-  | { kind: "unfunded" }
-  | { kind: "network"; message: string };
+/** A heartbeat is just a transaction, so its result is the shared outcome. */
+export type HeartbeatResult = TxOutcome;
+export type HeartbeatFailure = TxFailureReason;
 
 /**
  * Building is kept apart from signing so the transaction itself can be tested

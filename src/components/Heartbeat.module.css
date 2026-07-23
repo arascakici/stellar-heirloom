@@ -51,13 +51,3 @@
   color: var(--text-faint);
   text-wrap: pretty;
 }
-
-.sent {
-  font-size: var(--text-sm);
-  color: var(--patina-400);
-}
-
-.failed {
-  font-size: var(--text-sm);
-  color: var(--rust-400);
-}
