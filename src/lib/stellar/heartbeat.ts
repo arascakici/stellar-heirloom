@@ -10,7 +10,7 @@ import { horizon } from "./horizon";
 import { network } from "./network";
 import { fromStroops } from "./amount";
 import type { TxFailureReason, TxOutcome } from "./outcome";
-import { signXdr } from "../wallet/freighter";
+import { signXdr } from "../wallet/kit";
 
 /**
  * The life signal.

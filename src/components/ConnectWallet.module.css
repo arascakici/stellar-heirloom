@@ -38,6 +38,89 @@
   filter: saturate(0.5) brightness(0.85);
 }
 
+/* The room dims; the chest is lifted to the front. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background-color: rgb(0 0 0 / 0.6);
+  backdrop-filter: blur(2px);
+  animation: overlayIn 160ms ease;
+}
+
+/* The chest, opened: the wallet list in a framed wooden compartment. */
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 22rem;
+  padding: var(--space-5);
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 18px 50px rgb(0 0 0 / 0.6);
+  animation: dialogIn 200ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  transform-origin: top center;
+}
+
+.dialogHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dialogTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--text);
+}
+
+/* Small brass stud in the corner, not a competing button. */
+.close {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-sm);
+  line-height: 1;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  transition: color 120ms ease;
+}
+
+.close:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.close:disabled {
+  cursor: progress;
+  opacity: 0.5;
+}
+
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dialogIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .dialog {
+    animation: none;
+  }
+}
+
 .connected {
   display: flex;
   flex-direction: column;

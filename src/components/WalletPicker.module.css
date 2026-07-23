@@ -1,0 +1,83 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 20rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.loading {
+  font-size: var(--text-sm);
+  color: var(--text-faint);
+}
+
+/*
+ * Each available wallet is a drawer in the chest: inset wood, a brass edge that
+ * catches the light on hover. The row, not just its text, is the target.
+ */
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text);
+  text-align: left;
+  background-color: var(--surface-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.choice:hover:not(:disabled) {
+  border-color: var(--brass-400);
+  background-color: var(--wood-700);
+}
+
+.choice:disabled {
+  cursor: progress;
+  opacity: 0.55;
+}
+
+.unavailable {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-faint);
+}
+
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.name {
+  flex: 1;
+}
+
+.unavailable .name {
+  color: var(--text-muted);
+}
+
+.install {
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  color: var(--brass-300);
+  white-space: nowrap;
+}
+
+.install:hover {
+  filter: brightness(1.15);
+}
