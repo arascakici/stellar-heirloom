@@ -1,0 +1,35 @@
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+  /* Liquid glass: dark, translucent, the grain showing through a blur. */
+  background-color: rgb(26 20 14 / 0.55);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  border-bottom: 1px solid rgb(201 154 69 / 0.14);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 8px 24px rgb(0 0 0 / 0.25);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-5);
+}
+
+.mark {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  letter-spacing: -0.02em;
+  color: var(--parchment-200);
+}
+
+@media (max-width: 32rem) {
+  .inner {
+    padding: var(--space-3) var(--space-4);
+  }
+}

@@ -1,5 +1,4 @@
 import { AccountPanel } from "@/components/AccountPanel";
-import { ConnectWallet } from "@/components/ConnectWallet";
 
 import styles from "./page.module.css";
 
@@ -19,7 +18,6 @@ export default function Home() {
           refusing.
         </p>
         <div className={styles.action}>
-          <ConnectWallet />
           <AccountPanel />
         </div>
       </div>

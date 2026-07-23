@@ -18,7 +18,11 @@ export function AccountPanel() {
   const { address } = useWallet();
   const { balance, loading, refreshing, error, refresh } = useBalance(address);
 
-  if (!address) return null;
+  if (!address) {
+    return (
+      <p className={styles.prompt}>Connect your wallet above to begin.</p>
+    );
+  }
 
   if (loading) {
     return <p className={styles.status}>Reading the ledger…</p>;

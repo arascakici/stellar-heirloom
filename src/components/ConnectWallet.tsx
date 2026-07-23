@@ -40,29 +40,31 @@ export function ConnectWallet() {
 
   // Say nothing until we know the answer, rather than guessing "disconnected".
   if (status === "restoring") {
-    return <div className={styles.wrap} aria-busy="true" />;
+    return <div className={styles.slot} aria-busy="true" />;
   }
 
   if (status === "connected" && address) {
     return (
-      <div className={styles.connected}>
-        <span className={styles.label}>Connected on {network.label}</span>
+      <div className={styles.pill}>
+        <span className={styles.dot} aria-hidden />
+        <span className={styles.net}>{network.label}</span>
         <span className={`${styles.address} mono`} title={address}>
-          {shortenAddress(address, 6)}
+          {shortenAddress(address, 4)}
         </span>
-        <button type="button" className={styles.quiet} onClick={disconnect}>
+        <button
+          type="button"
+          className={styles.disconnect}
+          onClick={disconnect}
+          title="Ends the session here. Your wallet keeps its own record of trusted sites — remove heirloom there to revoke it completely."
+        >
           Disconnect
         </button>
-        <p className={styles.aside}>
-          This ends the session here. Your wallet keeps its own record of sites
-          it trusts — remove heirloom there to revoke it completely.
-        </p>
       </div>
     );
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.slot}>
       <button
         type="button"
         className={styles.button}
@@ -70,12 +72,6 @@ export function ConnectWallet() {
       >
         Connect wallet
       </button>
-
-      {error && (
-        <p className={styles.error} role="alert">
-          {describeWalletError(error)}
-        </p>
-      )}
 
       {open && (
         <div
@@ -104,6 +100,11 @@ export function ConnectWallet() {
               </button>
             </div>
             <WalletPicker onPick={handlePick} busy={connecting} />
+            {error && (
+              <p className={styles.error} role="alert">
+                {describeWalletError(error)}
+              </p>
+            )}
           </div>
         </div>
       )}

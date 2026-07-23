@@ -1,5 +1,6 @@
 .page {
-  min-height: 100dvh;
+  /* The glass bar takes the top; center what remains beneath it. */
+  min-height: calc(100dvh - 3.75rem);
   display: grid;
   place-items: center;
   padding: var(--space-6) var(--space-4);

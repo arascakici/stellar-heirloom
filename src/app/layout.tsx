@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, JetBrains_Mono, Newsreader } from "next/font/google";
+import { TopBar } from "@/components/TopBar";
 import { WalletProvider } from "@/lib/wallet/WalletProvider";
 
 import "./globals.css";
@@ -45,7 +46,10 @@ export default function RootLayout({
       className={`${fraunces.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
     >
       <body>
-        <WalletProvider>{children}</WalletProvider>
+        <WalletProvider>
+          <TopBar />
+          {children}
+        </WalletProvider>
       </body>
     </html>
   );

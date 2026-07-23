@@ -11,6 +11,11 @@
   color: var(--text-muted);
 }
 
+.prompt {
+  font-size: var(--text-base);
+  color: var(--text-muted);
+}
+
 .errorBox {
   display: flex;
   flex-direction: column;
