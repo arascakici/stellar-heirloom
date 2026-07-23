@@ -15,7 +15,7 @@ use soroban_sdk::{
 
 /// How a plan reacts to the owner's activity.
 #[contracttype]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Mode {
     /// Ordinary activity is fine; the plan fires only after a true silence and
     /// is cancelled deliberately.
@@ -26,7 +26,7 @@ pub enum Mode {
 
 /// Whether a plan is still in force.
 #[contracttype]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Status {
     Active = 0,
     Cancelled = 1,
@@ -34,7 +34,7 @@ pub enum Status {
 
 /// The record kept for one owner.
 #[contracttype]
-#[derive(Clone)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Plan {
     pub owner: Address,
     pub heir: Address,
@@ -224,6 +224,38 @@ impl Registry {
         .publish(&env);
 
         Ok(())
+    }
+
+    /// The plan recorded for `owner`, if any — cancelled plans are returned too,
+    /// so the caller can see the history rather than a bare absence.
+    pub fn get_plan(env: Env, owner: Address) -> Option<Plan> {
+        env.storage().persistent().get(&DataKey::Plan(owner))
+    }
+
+    /// Every plan that currently names `heir`. The heir index can hold stale
+    /// owners — an owner may have re-registered with a different heir after
+    /// cancelling — so each candidate is confirmed to still point back here
+    /// before it is returned.
+    pub fn plans_for_heir(env: Env, heir: Address) -> Vec<Plan> {
+        let owners: Vec<Address> = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Heirs(heir.clone()))
+            .unwrap_or_else(|| Vec::new(&env));
+
+        let mut plans = Vec::new(&env);
+        for owner in owners.iter() {
+            if let Some(plan) = env
+                .storage()
+                .persistent()
+                .get::<_, Plan>(&DataKey::Plan(owner))
+            {
+                if plan.heir == heir {
+                    plans.push_back(plan);
+                }
+            }
+        }
+        plans
     }
 }
 
