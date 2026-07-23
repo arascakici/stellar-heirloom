@@ -12,6 +12,8 @@ type NetworkConfig = {
   readonly label: string;
   readonly passphrase: string;
   readonly horizonUrl: string;
+  /** Soroban RPC endpoint — contract reads and invocations go here, not Horizon. */
+  readonly sorobanRpcUrl: string;
   /** Testnet only: hands out free XLM so a new account can be armed. */
   readonly friendbotUrl: string | null;
   readonly explorerUrl: string;
@@ -22,6 +24,7 @@ const NETWORKS: Record<StellarNetwork, NetworkConfig> = {
     label: "Testnet",
     passphrase: Networks.TESTNET,
     horizonUrl: "https://horizon-testnet.stellar.org",
+    sorobanRpcUrl: "https://soroban-testnet.stellar.org",
     friendbotUrl: "https://friendbot.stellar.org",
     explorerUrl: "https://stellar.expert/explorer/testnet",
   },
@@ -29,6 +32,7 @@ const NETWORKS: Record<StellarNetwork, NetworkConfig> = {
     label: "Mainnet",
     passphrase: Networks.PUBLIC,
     horizonUrl: "https://horizon.stellar.org",
+    sorobanRpcUrl: "https://mainnet.sorobanrpc.com",
     friendbotUrl: null,
     explorerUrl: "https://stellar.expert/explorer/public",
   },
@@ -44,6 +48,8 @@ export const NETWORK = resolveNetwork();
 export const network: NetworkConfig = {
   ...NETWORKS[NETWORK],
   horizonUrl: process.env.NEXT_PUBLIC_HORIZON_URL ?? NETWORKS[NETWORK].horizonUrl,
+  sorobanRpcUrl:
+    process.env.NEXT_PUBLIC_SOROBAN_RPC_URL ?? NETWORKS[NETWORK].sorobanRpcUrl,
 };
 
 export function explorerTxUrl(hash: string): string {
