@@ -9,7 +9,7 @@ them early, and the Stellar network itself does the refusing. The heir can even
 be *future you*: lose your keys, the account goes idle on its own, and a fresh
 wallet you set aside takes over.
 
-**Live demo:** _deploy to Vercel and add the link here_
+**Live demo:** [stellar-heirloom.vercel.app](https://stellar-heirloom.vercel.app)
 
 Built level-by-level for the **Stellar Builder Challenge**. One repository, one
 product — each belt adds a section here, and earlier levels stay in place as the
