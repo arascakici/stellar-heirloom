@@ -2,13 +2,11 @@
 
 import { useAccountBalance } from "@/lib/stellar/BalanceProvider";
 import { useAccountPlans } from "@/lib/stellar/PlanProvider";
-import { PlanStatus } from "@/lib/stellar/registry";
 import { useWallet } from "@/lib/wallet/WalletProvider";
 
 import { FundAccount } from "./FundAccount";
 import { HeirPlans } from "./HeirPlans";
-import { PlanCard } from "./PlanCard";
-import { PlanSetup } from "./PlanSetup";
+import { PlanVault } from "./PlanVault";
 import styles from "./AccountPanel.module.css";
 
 /**
@@ -27,7 +25,6 @@ export function AccountPanel() {
     refresh: refreshBalance,
   } = useAccountBalance();
   const {
-    plan,
     heirPlans,
     loading: plansLoading,
     error: plansError,
@@ -87,22 +84,9 @@ export function AccountPanel() {
     );
   }
 
-  const activePlan = plan && plan.status === PlanStatus.Active ? plan : null;
-
-  // A heartbeat or cancellation changes the plan and moves the fee, so both
-  // readings refresh together.
-  const refreshAll = () => {
-    void refreshPlans();
-    void refreshBalance();
-  };
-
   return (
     <div className={styles.panel}>
-      {activePlan ? (
-        <PlanCard plan={activePlan} onChanged={refreshAll} />
-      ) : (
-        <PlanSetup owner={address} onSealed={refreshAll} />
-      )}
+      <PlanVault owner={address} />
       {heirPlans.length > 0 && <HeirPlans plans={heirPlans} />}
     </div>
   );

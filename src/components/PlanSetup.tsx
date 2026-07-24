@@ -7,6 +7,7 @@ import { StrKey } from "@stellar/stellar-sdk";
 import type { TxOutcome } from "@/lib/stellar/outcome";
 import { PlanMode, register } from "@/lib/stellar/registry";
 
+import type { PlanDraft } from "./PlanNote";
 import { TransactionResult } from "./TransactionResult";
 import styles from "./PlanSetup.module.css";
 
@@ -31,8 +32,11 @@ const MODES = [
 
 type Props = {
   owner: string;
-  /** Called after a plan is recorded, so the view above can refresh. */
-  onSealed: () => void;
+  /**
+   * Called once the plan is on chain, with what was just sealed. The ceremony
+   * above takes the success from here — the form only keeps its failures.
+   */
+  onSealed: (draft: PlanDraft) => void;
 };
 
 export function PlanSetup({ owner, onSealed }: Props) {
@@ -59,9 +63,14 @@ export function PlanSetup({ owner, onSealed }: Props) {
     const period = BigInt(amountNum) * UNITS[unitIdx].seconds;
     const outcome = await register(owner, trimmedHeir, period, mode);
 
-    setResult(outcome);
     setPending(false);
-    if (outcome.ok) onSealed();
+
+    if (outcome.ok) {
+      onSealed({ heir: trimmedHeir, period, mode });
+      return;
+    }
+
+    setResult(outcome);
   }
 
   return (

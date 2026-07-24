@@ -104,3 +104,11 @@ reviewed end to end.
 - **L1 — White Belt:** wallet, balance, heartbeat transaction ✓
 - **Next:** an heir registry and the precondition engine that arms and cancels a
   real plan — added here as each belt lands.
+
+## Credits
+
+The chest is ["Chest" by Delapouite](https://game-icons.net/1x1/delapouite/chest.html)
+from [game-icons.net](https://game-icons.net), used under
+[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). It has been recoloured
+to the wood-and-brass palette and split into lid, body and lock so the two halves
+can close over a plan as it is sealed.

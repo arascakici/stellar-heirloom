@@ -1,0 +1,55 @@
+.landing {
+  padding-bottom: var(--space-6);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+/* The chest greets you shut — smaller than it plays during a sealing. */
+.emblem {
+  width: 9rem;
+  margin: 0 auto var(--space-4);
+}
+
+.wordmark {
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--parchment-100);
+}
+
+.rule {
+  width: 3rem;
+  height: 2px;
+  margin: var(--space-5) auto;
+  background-image: linear-gradient(
+    to right,
+    transparent,
+    var(--brass-500),
+    transparent
+  );
+}
+
+.promise {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  color: var(--text);
+  text-wrap: balance;
+}
+
+.footnote {
+  margin-top: var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+@media (max-width: 32rem) {
+  .wordmark {
+    font-size: var(--text-2xl);
+  }
+
+  .promise {
+    font-size: var(--text-base);
+  }
+}

@@ -1,0 +1,161 @@
+.stage {
+  width: 100%;
+}
+
+/* The two halves are stacked in one square and slide against each other. */
+.box {
+  position: relative;
+  width: 100%;
+  max-width: 13.5rem;
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.half {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition: transform 620ms cubic-bezier(0.3, 0.85, 0.25, 1);
+}
+
+.lid {
+  z-index: 3;
+}
+
+.base {
+  z-index: 2;
+}
+
+/* Gradient stops carry the palette here, where custom properties resolve. */
+.woodTop {
+  stop-color: var(--wood-500);
+}
+
+.woodBottom {
+  stop-color: var(--wood-800);
+}
+
+.lock {
+  fill: var(--brass-500);
+}
+
+.keyhole {
+  fill: var(--wood-950);
+}
+
+/* Light from inside, while the chest is still open. */
+.glow {
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+/* The seal, struck once the halves have met. */
+.seal {
+  opacity: 0;
+  transform-box: view-box;
+  transform-origin: 256px 250px;
+  transform: scale(0.4);
+  transition:
+    opacity 200ms ease,
+    transform 320ms cubic-bezier(0.34, 1.5, 0.5, 1);
+}
+
+.sealRing {
+  fill: none;
+  stroke: var(--brass-300);
+  stroke-width: 6;
+}
+
+.sealWax {
+  fill: var(--rust-600);
+  stroke: var(--rust-400);
+  stroke-width: 4;
+}
+
+.flare {
+  opacity: 0;
+  transform-box: view-box;
+  transform-origin: 256px 250px;
+}
+
+/* ---- poses ---- */
+
+/* Drawn apart, waiting to receive the plan. */
+.stage[data-phase="open"] .lid {
+  transform: translateY(-34%);
+}
+
+.stage[data-phase="open"] .base {
+  transform: translateY(30%);
+}
+
+.stage[data-phase="open"] .glow {
+  opacity: 1;
+}
+
+/* Coming together, and staying shut. */
+.stage[data-phase="shut"] .lid,
+.stage[data-phase="shut"] .base,
+.stage[data-phase="close"] .lid,
+.stage[data-phase="sealed"] .lid,
+.stage[data-phase="close"] .base,
+.stage[data-phase="sealed"] .base {
+  transform: translateY(0);
+}
+
+.stage[data-phase="close"] .glow {
+  opacity: 0.55;
+}
+
+/* Shut and struck. */
+.stage[data-phase="sealed"] .seal {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.stage[data-phase="sealed"] .flare {
+  animation: flare 620ms ease-out;
+}
+
+@keyframes flare {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  35% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+/* Standing keeps a brass ring that lifts off again; sealed takes wax. */
+.stage[data-mode="standing"] .sealWax {
+  display: none;
+}
+
+.stage[data-mode="sealed"] .sealRing {
+  display: none;
+}
+
+@media (max-width: 26rem) {
+  .box {
+    max-width: 11rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .half,
+  .glow,
+  .seal {
+    transition: none;
+  }
+
+  .stage[data-phase="sealed"] .flare {
+    animation: none;
+  }
+}

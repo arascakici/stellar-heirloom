@@ -15,8 +15,9 @@
 
 /* A brass nameplate: inset, catching a highlight along its top edge. */
 .plate {
+  width: 100%;
   max-width: 34rem;
-  padding: var(--space-7) var(--space-6);
+  padding: var(--space-6);
   background-color: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -24,59 +25,8 @@
   text-align: center;
 }
 
-.wordmark {
-  font-size: var(--text-3xl);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  color: var(--parchment-100);
-}
-
-.rule {
-  width: 3rem;
-  height: 2px;
-  margin: var(--space-5) auto;
-  background-image: linear-gradient(
-    to right,
-    transparent,
-    var(--brass-500),
-    transparent
-  );
-}
-
-.promise {
-  font-size: var(--text-lg);
-  line-height: var(--leading-snug);
-  color: var(--text);
-  text-wrap: balance;
-}
-
-.footnote {
-  margin-top: var(--space-5);
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  text-wrap: pretty;
-}
-
-.action {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-5);
-  margin-top: var(--space-6);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--border);
-}
-
 @media (max-width: 32rem) {
   .plate {
-    padding: var(--space-6) var(--space-5);
-  }
-
-  .wordmark {
-    font-size: var(--text-2xl);
-  }
-
-  .promise {
-    font-size: var(--text-base);
+    padding: var(--space-5);
   }
 }

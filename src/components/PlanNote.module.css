@@ -1,0 +1,56 @@
+/*
+ * Parchment, held between the halves of the chest. It sits above the body but
+ * below nothing — the lid passes over it as the chest shuts, which is what
+ * sells the plan being put away rather than merely disappearing.
+ */
+.note {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  width: 11rem;
+  max-width: 78%;
+  padding: var(--space-3);
+  transform: translate(-50%, -50%) scale(1);
+  background-color: var(--parchment-100);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.5);
+  text-align: center;
+  pointer-events: none;
+  transition:
+    opacity 300ms ease,
+    transform 420ms cubic-bezier(0.3, 0.8, 0.3, 1);
+}
+
+/* Drawn down into the lock and out of sight as the chest closes. */
+.note[data-tucked] {
+  opacity: 0;
+  transform: translate(-50%, -55%) scale(0.28);
+}
+
+.heir {
+  font-size: var(--text-xs);
+  color: var(--wood-800);
+}
+
+.after {
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--wood-900);
+  text-wrap: pretty;
+}
+
+.mode {
+  margin-top: var(--space-1);
+  padding: 0.05rem var(--space-2);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--parchment-100);
+  background-color: var(--wood-800);
+  border-radius: 999px;
+}
