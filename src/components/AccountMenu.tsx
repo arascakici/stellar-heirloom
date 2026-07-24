@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useAccountBalance } from "@/lib/stellar/BalanceProvider";
+import { useAccountPlans } from "@/lib/stellar/PlanProvider";
 import { network, shortenAddress } from "@/lib/stellar/network";
+import { PlanStatus } from "@/lib/stellar/registry";
 import { useWallet } from "@/lib/wallet/WalletProvider";
 
 import { Balance } from "./Balance";
@@ -18,6 +20,7 @@ import styles from "./AccountMenu.module.css";
 export function AccountMenu() {
   const { address, disconnect } = useWallet();
   const { balance, refreshing, refresh } = useAccountBalance();
+  const { plan, refresh: refreshPlans } = useAccountPlans();
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
 
@@ -41,6 +44,14 @@ export function AccountMenu() {
   }, [open]);
 
   if (!address) return null;
+
+  const hasClock = plan?.status === PlanStatus.Active;
+
+  // Winding moves the fee and resets last_seen, so both readings refresh.
+  const onWound = () => {
+    void refresh();
+    void refreshPlans();
+  };
 
   return (
     <div className={styles.root} ref={root}>
@@ -66,11 +77,17 @@ export function AccountMenu() {
           {balance?.funded ? (
             <>
               <Balance balance={balance} refreshing={refreshing} compact />
-              <Heartbeat address={address} onSent={refresh} />
+              {hasClock ? (
+                <Heartbeat address={address} onSent={onWound} />
+              ) : (
+                <p className={styles.note}>
+                  Seal a plan below, and its clock to wind appears here.
+                </p>
+              )}
             </>
           ) : (
             <p className={styles.note}>
-              This account isn’t funded yet. Fund it below to send a heartbeat.
+              This account isn’t funded yet. Fund it below to name an heir.
             </p>
           )}
           <button

@@ -1,0 +1,169 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 28rem;
+  text-align: left;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--text);
+}
+
+/* A small stamped tag for the mode. Neither is louder than the other. */
+.mode {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--parchment-200);
+  background-color: var(--surface-inset);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+}
+
+/* Each fact on its own line, a hairline between, like a ledger entry. */
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border);
+}
+
+.row:first-child {
+  border-top: 0;
+}
+
+.key {
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.value {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--text);
+  text-align: right;
+}
+
+.value.mono {
+  font-size: var(--text-sm);
+  color: var(--accent-bright);
+}
+
+.strong {
+  color: var(--parchment-100);
+}
+
+/* When the silence has run, the takeover is real — rust says so. */
+.due {
+  color: var(--rust-400);
+}
+
+.note {
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--text-faint);
+  text-wrap: pretty;
+}
+
+/*
+ * Calling off is the safe direction — it ends the countdown — so it reads as
+ * iron rather than alarm, turning to rust only on approach.
+ */
+.cancel {
+  align-self: flex-start;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 0.25em;
+  transition: color 120ms ease;
+}
+
+.cancel:hover {
+  color: var(--rust-400);
+}
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--surface-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.confirmText {
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+.confirmRow {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* The one place rust is a fill: the deliberate end of a plan. */
+.confirmYes {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--parchment-100);
+  background-color: var(--rust-600);
+  border: 1px solid var(--rust-500);
+  border-radius: var(--radius-sm);
+  transition: filter 120ms ease;
+}
+
+.confirmYes:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.confirmYes:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.confirmNo {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--parchment-200);
+  background-color: var(--wood-800);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 120ms ease;
+}
+
+.confirmNo:hover:not(:disabled) {
+  border-color: var(--brass-400);
+}
+
+.confirmNo:disabled {
+  opacity: 0.6;
+}

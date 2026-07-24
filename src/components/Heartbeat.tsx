@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-import { sendHeartbeat, type HeartbeatResult } from "@/lib/stellar/heartbeat";
+import type { TxOutcome } from "@/lib/stellar/outcome";
+import { heartbeatPlan } from "@/lib/stellar/registry";
 
 import { TransactionResult } from "./TransactionResult";
 import styles from "./Heartbeat.module.css";
@@ -14,13 +15,13 @@ type Props = {
 
 export function Heartbeat({ address, onSent }: Props) {
   const [sending, setSending] = useState(false);
-  const [result, setResult] = useState<HeartbeatResult | null>(null);
+  const [result, setResult] = useState<TxOutcome | null>(null);
 
   async function handleSend() {
     setSending(true);
     setResult(null);
 
-    const outcome = await sendHeartbeat(address);
+    const outcome = await heartbeatPlan(address);
     setResult(outcome);
     setSending(false);
 
@@ -39,8 +40,8 @@ export function Heartbeat({ address, onSent }: Props) {
       </button>
 
       <p className={styles.explain}>
-        A one-stroop note to yourself — nothing leaves but the fee. It winds back
-        the clock your plan counts down against.
+        Tells the registry you’re still here — nothing leaves but the fee. It
+        winds back the silence your plan counts down against.
       </p>
 
       {result && (
