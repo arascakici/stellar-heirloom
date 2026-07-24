@@ -18,16 +18,22 @@ export type PlanDraft = {
   mode: PlanMode;
 };
 
+/**
+ * hidden — not yet handed over, so it can rise into view.
+ * shown  — held between the halves.
+ * tucked — drawn down into the lock as they meet.
+ */
+export type NoteState = "hidden" | "shown" | "tucked";
+
 export function PlanNote({
   draft,
-  tucked,
+  state,
 }: {
   draft: PlanDraft;
-  /** True once the chest has closed over it. */
-  tucked: boolean;
+  state: NoteState;
 }) {
   return (
-    <div className={styles.note} data-tucked={tucked || undefined} aria-hidden>
+    <div className={styles.note} data-state={state} aria-hidden>
       <span className={`${styles.heir} mono`}>
         {shortenAddress(draft.heir, 4)}
       </span>

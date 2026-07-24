@@ -5,3 +5,65 @@
   gap: var(--space-5);
   width: 100%;
 }
+
+/*
+ * Whatever the panel is currently holding — the form, or the plan. It rises in
+ * once its turn comes and lifts away when handed over, so the swap reads as one
+ * thing replacing another rather than two hard cuts.
+ */
+.swap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  animation: rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.swap[data-leaving] {
+  animation: none;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.985);
+  transition:
+    opacity 320ms ease,
+    transform 320ms cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+/*
+ * Coming back out of a chest that has just burst open: it arrives from where
+ * the chest was, small and above, and grows into place.
+ */
+.swap[data-emerging] {
+  animation: emerge 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes emerge {
+  from {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swap,
+  .swap[data-leaving],
+  .swap[data-emerging] {
+    animation: none;
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}

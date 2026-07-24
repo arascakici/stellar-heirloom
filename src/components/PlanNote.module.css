@@ -15,21 +15,42 @@
   width: 11rem;
   max-width: 78%;
   padding: var(--space-3);
-  transform: translate(-50%, -50%) scale(1);
   background-color: var(--parchment-100);
   border-radius: var(--radius-sm);
   box-shadow: 0 6px 18px rgb(0 0 0 / 0.5);
   text-align: center;
   pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Not yet handed over: a touch low and small, ready to rise. */
+.note[data-state="hidden"] {
+  opacity: 0;
+  transform: translate(-50%, -40%) scale(0.92);
+}
+
+/* Held between the halves — it arrives after they have begun to part. */
+.note[data-state="shown"] {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
   transition:
-    opacity 300ms ease,
-    transform 420ms cubic-bezier(0.3, 0.8, 0.3, 1);
+    opacity 420ms ease 200ms,
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1) 200ms;
 }
 
 /* Drawn down into the lock and out of sight as the chest closes. */
-.note[data-tucked] {
+.note[data-state="tucked"] {
   opacity: 0;
-  transform: translate(-50%, -55%) scale(0.28);
+  transform: translate(-50%, -52%) scale(0.24);
+  transition:
+    opacity 420ms ease 120ms,
+    transform 640ms cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note {
+    transition: none;
+  }
 }
 
 .heir {

@@ -14,15 +14,29 @@ import styles from "./Chest.module.css";
  * sealed. The form to name an heir gets the screen to itself.
  *
  *   shut   — closed and quiet, the emblem on the landing.
+ *   enter  — closed and not yet visible; the pose a ceremony starts from, so
+ *            that flipping to `open` on the next frame is a real opening
+ *            rather than a chest that appears already apart.
  *   open   — the halves are drawn apart, the plan hanging between them.
  *   close  — they come together over it.
  *   sealed — shut, with a seal struck on the lock.
+ *   break  — the plan is called off: the chest jolts and the seal splits.
+ *   surge  — it comes toward you, opening and flooding with light.
+ *   spill  — it grows past the frame and gives the screen back.
  *
  * Artwork: "Chest" by Delapouite (game-icons.net), CC BY 3.0. Recoloured to the
  * wood-and-brass palette and split into lid, body and lock so the halves can be
  * moved independently.
  */
-export type ChestPhase = "shut" | "open" | "close" | "sealed";
+export type ChestPhase =
+  | "shut"
+  | "enter"
+  | "open"
+  | "close"
+  | "sealed"
+  | "break"
+  | "surge"
+  | "spill";
 
 type Props = {
   phase: ChestPhase;
@@ -81,9 +95,20 @@ export function Chest({ phase, mode = "standing", children }: Props) {
             d="M256 223.794a18.667 16.103 0 0 1 18.666 16.1 18.667 16.103 0 0 1-9.666 14.09v37.214h-18V254a18.667 16.103 0 0 1-9.666-14.106 18.667 16.103 0 0 1 18.666-16.1z"
           />
 
+          {/*
+           * The seal is drawn as two halves rather than one disc, so that
+           * calling a plan off can break it down the middle instead of merely
+           * fading it out.
+           */}
           <g className={styles.seal}>
-            <circle className={styles.sealRing} cx="256" cy="250" r="30" />
-            <circle className={styles.sealWax} cx="256" cy="250" r="26" />
+            <g className={styles.sealLeft}>
+              <path className={styles.sealWax} d="M256 224 A26 26 0 0 0 256 276 Z" />
+              <path className={styles.sealRing} d="M256 220 A30 30 0 0 0 256 280" />
+            </g>
+            <g className={styles.sealRight}>
+              <path className={styles.sealWax} d="M256 224 A26 26 0 0 1 256 276 Z" />
+              <path className={styles.sealRing} d="M256 220 A30 30 0 0 1 256 280" />
+            </g>
           </g>
           <ellipse
             className={styles.flare}
