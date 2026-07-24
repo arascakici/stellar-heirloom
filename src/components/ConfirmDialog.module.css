@@ -1,0 +1,109 @@
+/* The room dims; one decision is left in front. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background-color: rgb(0 0 0 / 0.6);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: overlayIn 160ms ease;
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 22rem;
+  padding: var(--space-5);
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 18px 50px rgb(0 0 0 / 0.6);
+  text-align: left;
+  animation: dialogIn 200ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--text);
+}
+
+.body {
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* The one place rust is a fill: the deliberate end of a plan. */
+.confirm {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--parchment-100);
+  background-color: var(--rust-600);
+  border: 1px solid var(--rust-500);
+  border-radius: var(--radius-sm);
+  transition: filter 120ms ease;
+}
+
+.confirm:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.confirm:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.dismiss {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--parchment-200);
+  background-color: var(--wood-800);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 120ms ease;
+}
+
+.dismiss:hover:not(:disabled) {
+  border-color: var(--brass-400);
+}
+
+.dismiss:disabled {
+  opacity: 0.6;
+}
+
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dialogIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .dialog {
+    animation: none;
+  }
+}

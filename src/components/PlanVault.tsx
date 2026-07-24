@@ -5,12 +5,15 @@ import { flushSync } from "react-dom";
 
 import { useAccountBalance } from "@/lib/stellar/BalanceProvider";
 import { useAccountPlans } from "@/lib/stellar/PlanProvider";
-import { PlanMode, PlanStatus } from "@/lib/stellar/registry";
+import type { TxOutcome } from "@/lib/stellar/outcome";
+import { cancelPlan, PlanMode, PlanStatus } from "@/lib/stellar/registry";
 
 import { Chest, type ChestPhase } from "./Chest";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { PlanCard } from "./PlanCard";
 import { PlanNote, type NoteState, type PlanDraft } from "./PlanNote";
 import { PlanSetup } from "./PlanSetup";
+import { TransactionResult } from "./TransactionResult";
 import styles from "./PlanVault.module.css";
 
 /**
@@ -55,6 +58,11 @@ export function PlanVault({ owner }: { owner: string }) {
   const [leaving, setLeaving] = useState(false);
   /** True while the form is coming back out of a chest that has just opened. */
   const [emerging, setEmerging] = useState(false);
+
+  // Breaking the seal is put as a question first, and asked by the chest.
+  const [confirming, setConfirming] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState<TxOutcome | null>(null);
 
   const stage = useRef<HTMLDivElement>(null);
 
@@ -151,12 +159,34 @@ export function PlanVault({ owner }: { owner: string }) {
     });
   }
 
+  /** Reaching for the seal asks the question; it does not answer it. */
+  function requestBreak() {
+    setCancelError(null);
+    setConfirming(true);
+  }
+
+  async function confirmBreak() {
+    setCancelling(true);
+    setCancelError(null);
+
+    const outcome = await cancelPlan(owner);
+    setCancelling(false);
+
+    if (outcome.ok) {
+      setConfirming(false);
+      breakOpen();
+      return;
+    }
+
+    setCancelError(outcome);
+  }
+
   /**
    * The plan is off. Nothing is holding the chest shut any more, so it breaks
    * open: the seal splits, the chest comes at you as it throws itself wide, and
    * the choices climb back out of it.
    */
-  function handleCancelled() {
+  function breakOpen() {
     // The plan's own card withdraws while the seal is being broken.
     setLeaving(true);
     setCeremony({ phase: "break", draft: null });
@@ -212,7 +242,12 @@ export function PlanVault({ owner }: { owner: string }) {
   return (
     <div className={styles.vault} ref={stage}>
       {showChest && (
-        <Chest phase={phase} mode={mode}>
+        <Chest
+          phase={phase}
+          mode={mode}
+          onBreak={activePlan ? requestBreak : undefined}
+          breakDisabled={confirming || cancelling}
+        >
           {ceremony?.draft && (
             <PlanNote draft={ceremony.draft} state={noteState} />
           )}
@@ -231,8 +266,23 @@ export function PlanVault({ owner }: { owner: string }) {
 
       {showCard && activePlan && (
         <div className={styles.swap} data-leaving={leaving || undefined}>
-          <PlanCard plan={activePlan} onChanged={handleCancelled} />
+          <PlanCard plan={activePlan} />
         </div>
+      )}
+
+      {confirming && (
+        <ConfirmDialog
+          title="Break the seal?"
+          body="Your heir can no longer take over. You can seal a new plan afterwards."
+          confirmLabel="Yes, break it"
+          busyLabel="Breaking…"
+          dismissLabel="Leave it sealed"
+          busy={cancelling}
+          onConfirm={confirmBreak}
+          onDismiss={() => setConfirming(false)}
+        >
+          {cancelError && <TransactionResult outcome={cancelError} />}
+        </ConfirmDialog>
       )}
     </div>
   );

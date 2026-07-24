@@ -44,17 +44,41 @@ type Props = {
   mode?: "standing" | "sealed";
   /** The plan itself, held between the halves until they shut. */
   children?: ReactNode;
+  /**
+   * What breaking the seal does. Given only while a plan is sealed and may be
+   * called off — the chest then becomes the way to do it, since it is the thing
+   * holding the plan shut. Reaching for it lifts the chest, cracks the seal and
+   * names the act.
+   */
+  onBreak?: () => void;
+  /** Held shut while the question is already being asked, or being answered. */
+  breakDisabled?: boolean;
+  breakLabel?: string;
 };
 
-export function Chest({ phase, mode = "standing", children }: Props) {
+export function Chest({
+  phase,
+  mode = "standing",
+  children,
+  onBreak,
+  breakDisabled = false,
+  breakLabel = "Break the seal",
+}: Props) {
   // Two chests on one page would otherwise fight over the same gradient ids.
   const uid = useId().replace(/:/g, "");
   const woodId = `chest-wood-${uid}`;
   const glowId = `chest-glow-${uid}`;
 
-  return (
-    <div className={styles.stage} data-phase={phase} data-mode={mode}>
-      <div className={styles.box}>
+  /*
+   * The wrapper stays a button for as long as breaking is on the table, even
+   * while it is held shut — swapping the element would rebuild the chest and
+   * replay its landing animation on every click.
+   */
+  const offered = onBreak !== undefined;
+  const breakable = offered && phase === "sealed" && !breakDisabled;
+
+  const chest = (
+    <div className={styles.box}>
         {/* Body: the lower half, with the lock, the light and the seal. */}
         <svg className={`${styles.half} ${styles.base}`} viewBox="0 0 512 512" aria-hidden>
           <defs>
@@ -110,6 +134,13 @@ export function Chest({ phase, mode = "standing", children }: Props) {
               <path className={styles.sealRing} d="M256 220 A30 30 0 0 1 256 280" />
             </g>
           </g>
+
+          {/* The fault the seal will give along, shown when reached for. */}
+          <path
+            className={styles.crack}
+            d="M256 224 l-5 10 l7 6 l-6 10 l6 7 l-4 9 l4 10"
+            fill="none"
+          />
           <ellipse
             className={styles.flare}
             cx="256"
@@ -128,8 +159,25 @@ export function Chest({ phase, mode = "standing", children }: Props) {
           />
         </svg>
 
-        {children}
-      </div>
+      {children}
+    </div>
+  );
+
+  return (
+    <div className={styles.stage} data-phase={phase} data-mode={mode}>
+      {offered ? (
+        <button
+          type="button"
+          className={styles.breakable}
+          onClick={onBreak}
+          disabled={!breakable}
+        >
+          {chest}
+          <span className={styles.hint}>{breakLabel}</span>
+        </button>
+      ) : (
+        chest
+      )}
     </div>
   );
 }

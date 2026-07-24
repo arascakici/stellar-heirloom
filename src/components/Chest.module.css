@@ -109,6 +109,79 @@
   transform-origin: 256px 250px;
 }
 
+/* The fault line through the seal. Hidden until the chest is reached for. */
+.crack {
+  opacity: 0;
+  stroke: var(--wood-950);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 200ms ease;
+}
+
+/*
+ * A sealed chest is the thing holding the plan shut, so it is also the way to
+ * let it go. Reaching for it lifts the chest off the page and shows the fault
+ * the seal would give along.
+ */
+.breakable {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.breakable:disabled {
+  cursor: default;
+}
+
+.breakable .box {
+  transition: transform 320ms var(--ease-out);
+}
+
+.breakable:not(:disabled):hover .box,
+.breakable:focus-visible .box {
+  transform: translateY(-5px);
+}
+
+.breakable:not(:disabled):hover .crack,
+.breakable:focus-visible .crack {
+  opacity: 0.85;
+}
+
+.breakable:focus-visible {
+  outline: 2px solid var(--brass-400);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
+/* It names what it would do — quietly at rest, plainly when reached for. */
+.hint {
+  display: block;
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rust-400);
+  opacity: 0.55;
+  transition:
+    opacity 200ms ease,
+    transform 260ms var(--ease-out);
+}
+
+.breakable:not(:disabled):hover .hint,
+.breakable:focus-visible .hint {
+  opacity: 1;
+  transform: translateY(2px);
+}
+
+/* Once the question has been put, the chest stops offering. */
+.breakable:disabled .hint {
+  opacity: 0;
+}
+
 /* ---- poses ---- */
 
 /* Drawn apart, waiting to receive the plan. */
@@ -321,7 +394,9 @@
   .stage,
   .half,
   .glow,
-  .seal {
+  .seal,
+  .breakable .box,
+  .hint {
     transition: none;
   }
 
