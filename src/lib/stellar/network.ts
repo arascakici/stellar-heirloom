@@ -60,6 +60,10 @@ export function explorerAccountUrl(address: string): string {
   return `${network.explorerUrl}/account/${address}`;
 }
 
+export function explorerContractUrl(contractId: string): string {
+  return `${network.explorerUrl}/contract/${contractId}`;
+}
+
 /** Addresses are 56 characters; show enough of both ends to compare by eye. */
 export function shortenAddress(address: string, visible = 4): string {
   if (address.length <= visible * 2 + 1) return address;

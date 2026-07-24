@@ -1,0 +1,66 @@
+.plate {
+  padding: var(--space-4) var(--space-5);
+  background-color: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-inset);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+}
+
+.key {
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.value {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--text);
+  text-align: right;
+}
+
+/* The full address, allowed to wrap rather than be cut short. */
+.id {
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--accent-bright);
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.25em;
+  transition: text-decoration-color 120ms ease;
+}
+
+.id:hover {
+  text-decoration-color: var(--brass-600);
+}
+
+@media (max-width: 30rem) {
+  /* Stack, so a 56-character address is not squeezed into half the width. */
+  .row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  .value {
+    text-align: left;
+  }
+}

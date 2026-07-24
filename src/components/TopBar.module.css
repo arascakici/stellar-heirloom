@@ -21,15 +21,72 @@
   padding: var(--space-3) var(--space-5);
 }
 
+/* The way through sits with the wallet, not with the mark. */
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/*
+ * Chrome, not prose: the bar's links carry no rule under them. The global
+ * anchor style leaves the browser's underline in place, which is right for a
+ * link inside a sentence and wrong for a wordmark.
+ */
+.mark,
+.link {
+  text-decoration: none;
+}
+
 .mark {
   font-family: var(--font-display);
   font-size: var(--text-lg);
   letter-spacing: -0.02em;
   color: var(--parchment-200);
+  transition: color 120ms ease;
+}
+
+.mark:hover {
+  color: var(--parchment-100);
+}
+
+/* A quiet way through, brass only where you are. */
+.link {
+  font-size: var(--text-sm);
+  color: var(--text-faint);
+  transition: color 120ms ease;
+}
+
+.link:hover {
+  color: var(--text-muted);
+}
+
+.link[aria-current="page"] {
+  color: var(--accent-bright);
 }
 
 @media (max-width: 32rem) {
   .inner {
     padding: var(--space-3) var(--space-4);
+  }
+}
+
+/* Three things share the bar now; on a small phone they give ground. */
+@media (max-width: 26rem) {
+  .inner {
+    gap: var(--space-3);
+  }
+
+  .right {
+    gap: var(--space-3);
+  }
+
+  .mark {
+    font-size: var(--text-base);
+  }
+
+  .link {
+    font-size: var(--text-xs);
   }
 }
