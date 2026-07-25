@@ -120,6 +120,16 @@ frontend follows without a code change; the id baked into `REGISTRY_ID` in
 `src/lib/stellar/registry.ts` is only the fallback. Either way, record the
 deployment in [`deployments.md`](deployments.md) alongside the existing entries.
 
+The same thing can be done from CI without a key ever touching a laptop: the
+**Deploy contract** workflow
+([`.github/workflows/deploy-contract.yml`](../.github/workflows/deploy-contract.yml))
+runs on manual dispatch only, takes a typed confirmation, builds the wasm from
+source, verifies the CLI download against a pinned checksum, and signs with the
+`STELLAR_DEPLOYER_SECRET` secret of the `testnet` environment.
+
+The tests and both checks above also run on every push — see the
+[continuous integration](../README.md#continuous-integration) section.
+
 ## What is deployed
 
 The live contract, its wasm hash, and the transactions that put it there are in

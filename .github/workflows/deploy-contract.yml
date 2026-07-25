@@ -1,0 +1,90 @@
+name: Deploy contract
+
+# Deploying is deliberate, never automatic: a push must not be able to put a new
+# registry on chain behind anyone's back. Run it from the Actions tab and type
+# the confirmation.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "deploy" to confirm'
+        required: true
+        type: string
+
+env:
+  # Bump both together; the checksum is what stops a swapped binary from ever
+  # seeing the deployer's secret key.
+  STELLAR_CLI_VERSION: 27.0.0
+  STELLAR_CLI_SHA256: 357bf712f6353c28cd33c794402a3c87231757a5b305e6ef1604365af4fdd556
+
+jobs:
+  deploy:
+    name: Deploy to testnet
+    runs-on: ubuntu-latest
+    # Testnet only. The arming and cancellation paths are where a bug costs
+    # someone their account, so mainnet stays out of this workflow entirely.
+    environment: testnet
+    steps:
+      - name: Check confirmation
+        if: inputs.confirm != 'deploy'
+        run: |
+          echo "::error::Confirmation not given — expected the word 'deploy'."
+          exit 1
+
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: contracts
+
+      - name: Build for wasm32v1-none
+        run: cargo build --manifest-path contracts/Cargo.toml --target wasm32v1-none --release
+
+      - name: Install Stellar CLI
+        run: |
+          set -euo pipefail
+          url="https://github.com/stellar/stellar-cli/releases/download/v${STELLAR_CLI_VERSION}/stellar-cli-${STELLAR_CLI_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+          curl -fsSL "$url" -o stellar-cli.tar.gz
+          echo "${STELLAR_CLI_SHA256}  stellar-cli.tar.gz" | sha256sum --check --strict
+          tar -xzf stellar-cli.tar.gz
+          mkdir -p "$HOME/.local/bin"
+          install -m 0755 stellar "$HOME/.local/bin/stellar"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Deploy
+        env:
+          # Read from the environment rather than the command line, so the key
+          # never appears in a process listing or a command echo.
+          STELLAR_ACCOUNT: ${{ secrets.STELLAR_DEPLOYER_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${STELLAR_ACCOUNT:-}" ]; then
+            echo "::error::STELLAR_DEPLOYER_SECRET is not set for this environment."
+            exit 1
+          fi
+          stellar contract deploy \
+            --wasm contracts/target/wasm32v1-none/release/registry.wasm \
+            --network testnet \
+            > contract-id.txt
+          echo "CONTRACT_ID=$(cat contract-id.txt)" >> "$GITHUB_ENV"
+
+      - name: Report
+        run: |
+          {
+            echo "### Registry deployed"
+            echo
+            echo "| | |"
+            echo "| --- | --- |"
+            echo "| **Contract** | \`${CONTRACT_ID}\` |"
+            echo "| **Network** | Testnet |"
+            echo "| **Explorer** | https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID} |"
+            echo
+            echo "Set \`NEXT_PUBLIC_REGISTRY_ID\` to this id, and record the"
+            echo "deployment in \`contracts/deployments.md\`."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,5 +1,7 @@
 # heirloom
 
+[![CI](https://github.com/arascakici/stellar-heirloom/actions/workflows/ci.yml/badge.svg)](https://github.com/arascakici/stellar-heirloom/actions/workflows/ci.yml)
+
 **A dead man's switch for Stellar.**
 
 heirloom lets you sign one transaction today so that, if your account ever goes
@@ -165,6 +167,24 @@ This arms throwaway testnet accounts and proves, with real transactions, that a
 takeover is refused while an account is active and accepted only once it has gone
 idle — for both the standing (survives activity) and sealed (one-shot) plan
 modes. Ten checks, all passing. It becomes the CI suite at a later belt.
+
+## Continuous integration
+
+Every push and pull request runs
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml), in two jobs:
+
+| Job | What it checks |
+| --- | --- |
+| **Registry contract** | `cargo fmt --check`, `cargo clippy -D warnings`, the 14 unit tests, and a build for `wasm32v1-none` — the target the contract actually ships to, so a wasm-only failure can't reach a deploy. The wasm is kept as a build artifact. |
+| **Web app** | `npm ci`, `npm run lint`, `npm run build` on Node 20 — the floor this README promises, rather than the version we happen to develop on. |
+
+Deploying is deliberate and never automatic: no push can put a new registry on
+chain. [`.github/workflows/deploy-contract.yml`](.github/workflows/deploy-contract.yml)
+runs only from the Actions tab, only after the word `deploy` is typed into its
+confirmation input, and only against testnet. It builds the wasm from source,
+installs a checksum-pinned Stellar CLI, signs with the `STELLAR_DEPLOYER_SECRET`
+secret of the `testnet` environment, and prints the new contract id to the job
+summary.
 
 ## Network
 

@@ -194,7 +194,9 @@ impl Registry {
 
         let key = DataKey::Plan(owner.clone());
         env.storage().persistent().set(&key, &plan);
-        env.storage().persistent().extend_ttl(&key, PLAN_TTL, PLAN_TTL);
+        env.storage()
+            .persistent()
+            .extend_ttl(&key, PLAN_TTL, PLAN_TTL);
 
         Heartbeat {
             owner,
@@ -215,7 +217,9 @@ impl Registry {
 
         let key = DataKey::Plan(owner.clone());
         env.storage().persistent().set(&key, &plan);
-        env.storage().persistent().extend_ttl(&key, PLAN_TTL, PLAN_TTL);
+        env.storage()
+            .persistent()
+            .extend_ttl(&key, PLAN_TTL, PLAN_TTL);
 
         Cancelled {
             owner,
