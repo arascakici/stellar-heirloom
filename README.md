@@ -31,8 +31,10 @@ you seal it.
 | **Network** | Testnet |
 | **Sample `register` call** | [`f8121bbe…`](https://stellar.expert/explorer/testnet/tx/f8121bbe5e06e0d96ac6b84728109a23c7236541d06e3fdf16aaca23c6a9ebfd) |
 
-Every deployment fact — wasm hash, upload and create hashes, redeploy steps —
-is recorded in [`contracts/deployments.md`](contracts/deployments.md).
+The contract's interface, storage and events are documented in
+[`contracts/README.md`](contracts/README.md); every deployment fact — wasm hash,
+upload and create hashes, redeploy steps — in
+[`contracts/deployments.md`](contracts/deployments.md).
 
 ### Features
 
@@ -133,13 +135,14 @@ Open <http://localhost:3000>, connect a wallet, and — if the account is new �
 click **Fund with test XLM** to have the friendbot faucet create it. Then name an
 heir and seal the plan; **I'm here**, in the account menu, winds the clock back.
 
-heirloom runs on testnet with no configuration. Three optional variables repoint it:
+heirloom runs on testnet with no configuration. Four optional variables repoint it:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `NEXT_PUBLIC_STELLAR_NETWORK` | `testnet` | `testnet` or `mainnet`. |
 | `NEXT_PUBLIC_HORIZON_URL` | network default | Override the Horizon endpoint. |
 | `NEXT_PUBLIC_SOROBAN_RPC_URL` | network default | Override the Soroban RPC endpoint. |
+| `NEXT_PUBLIC_REGISTRY_ID` | the deployed registry | Point at your own deployment of the contract. |
 
 ## Testing
 
