@@ -125,7 +125,7 @@ leaves the account but the fee; the point is the on-chain record.
 ### Run the web app
 
 ```bash
-git clone https://github.com/<your-account>/stellar-heirloom.git
+git clone https://github.com/arascakici/stellar-heirloom.git
 cd stellar-heirloom
 npm install
 npm run dev
