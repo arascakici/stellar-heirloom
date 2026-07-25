@@ -15,6 +15,58 @@ Built level-by-level for the **Stellar Builder Challenge**. One repository, one
 product — each belt adds a section here, and earlier levels stay in place as the
 README grows.
 
+## Level 2 — Yellow Belt
+
+The plan goes on chain. A Soroban contract written in Rust keeps the **record** —
+who named whom, after how long a silence, in which mode — and nothing else. It
+never holds a balance, never moves an asset, and cannot take an account over on
+anyone's behalf; the takeover itself stays a precondition transaction the network
+enforces. A notary, not a vault. Alongside it the wallet stops being Freighter
+alone, and the interface finds its object: a chest that closes over a plan when
+you seal it.
+
+| | |
+| --- | --- |
+| **Contract** | [`CBIBPVG7QXJWUWIFOL3LZRIR37YYKBOAM5YIUEP74RJHB35YXT2OKXTG`](https://stellar.expert/explorer/testnet/contract/CBIBPVG7QXJWUWIFOL3LZRIR37YYKBOAM5YIUEP74RJHB35YXT2OKXTG) |
+| **Network** | Testnet |
+| **Sample `register` call** | [`f8121bbe…`](https://stellar.expert/explorer/testnet/tx/f8121bbe5e06e0d96ac6b84728109a23c7236541d06e3fdf16aaca23c6a9ebfd) |
+
+Every deployment fact — wasm hash, upload and create hashes, redeploy steps —
+is recorded in [`contracts/deployments.md`](contracts/deployments.md).
+
+### Features
+
+- **The registry contract** — `register`, `heartbeat` and `cancel` behind the
+  owner's `require_auth`, plus `get_plan` and `plans_for_heir` as free reads, so
+  an heir can discover a plan without being told about it.
+- **Two plan modes, recorded on chain** — *standing* survives ordinary activity
+  and is called off deliberately; *sealed* is one-shot, and any transaction at
+  all voids it.
+- **Events with indexed topics** — `Registered`, `Heartbeat` and `Cancelled`,
+  keyed on owner and heir, so a watcher can subscribe to exactly the plans that
+  name them.
+- **Typed contract errors** — `PlanExists`, `InvalidPeriod`, `NoPlan` and
+  `NotActive` come back through the frontend as sentences, never as a raw code.
+- **Six wallets, one door** — Freighter, xBull, Albedo, LOBSTR, Rabet and Hana
+  through StellarWalletsKit, with the picker drawn in heirloom's own brass
+  rather than the kit's default modal; uninstalled wallets offer a way to get one.
+- **The chest** — sealing a plan draws the lid down over the form until the
+  words are enclosed; calling it off breaks the lock, and the chest comes
+  forward and opens to give the choices back.
+- **A plan dashboard** — heir, silence, last sign of life and a live countdown
+  to takeover, plus the plans that name *you* as heir.
+- **A live registry page** — what the contract has witnessed, polled from
+  Soroban RPC `getEvents` and written out as sentences; your own account's
+  doings refresh the plan in place.
+- **14 contract unit tests**, covering both modes, every error, and the
+  heir-discovery index.
+
+### Screenshots
+
+| Choosing a wallet | A sealed plan | The registry |
+| --- | --- | --- |
+| ![Six wallets in heirloom's own picker](docs/screenshots/l2-wallet.png) | ![A standing plan, chest shut, counting down to takeover](docs/screenshots/l2-plan.png) | ![The registry page with the contract identity and its record](docs/screenshots/l2-registry.png) |
+
 ## Level 1 — White Belt
 
 The foundation: connect a Freighter wallet on testnet, read and show the balance,
@@ -48,17 +100,25 @@ leaves the account but the fee; the point is the on-chain record.
 - **[Next.js](https://nextjs.org)** (App Router) + **TypeScript** — hand-written
   CSS, no UI framework, so the interface carries its own chest-and-brass character.
 - **[@stellar/stellar-sdk](https://github.com/stellar/js-stellar-sdk)** — builds
-  and submits transactions against Horizon.
-- **[@stellar/freighter-api](https://github.com/stellar/freighter-api)** — wallet
-  connection and signing.
+  and submits transactions against Horizon, and calls the contract over Soroban RPC.
+- **[stellar-wallets-kit](https://github.com/Creit-Tech/Stellar-Wallets-Kit)** —
+  six wallets behind one interface; heirloom draws the picker itself.
+- **[soroban-sdk](https://github.com/stellar/rs-soroban-sdk)** (Rust) — the
+  registry contract, built to `wasm32v1-none`.
 
 ## Getting started
 
 ### Prerequisites
 
 - [ ] Node.js 20 or newer
-- [ ] The [Freighter](https://www.freighter.app/) extension, set to **Testnet**
-      (Freighter → settings → Network → Test Net)
+- [ ] A Stellar wallet set to **Testnet** — [Freighter](https://www.freighter.app/),
+      xBull, Albedo, LOBSTR, Rabet or Hana. In Freighter that is
+      settings → Network → Test Net.
+- [ ] Only to rebuild the contract: [Rust](https://rustup.rs) with the
+      `wasm32v1-none` target and the
+      [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli)
+      27 or newer. The web app talks to the already-deployed contract, so this
+      is optional.
 
 ### Run the web app
 
@@ -69,18 +129,28 @@ npm install
 npm run dev
 ```
 
-Open <http://localhost:3000>, connect Freighter, and — if the account is new —
-click **Fund with test XLM** to have the friendbot faucet create it. Then press
-**I'm here** to send the heartbeat.
+Open <http://localhost:3000>, connect a wallet, and — if the account is new —
+click **Fund with test XLM** to have the friendbot faucet create it. Then name an
+heir and seal the plan; **I'm here**, in the account menu, winds the clock back.
 
-heirloom runs on testnet with no configuration. Two optional variables repoint it:
+heirloom runs on testnet with no configuration. Three optional variables repoint it:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `NEXT_PUBLIC_STELLAR_NETWORK` | `testnet` | `testnet` or `mainnet`. |
 | `NEXT_PUBLIC_HORIZON_URL` | network default | Override the Horizon endpoint. |
+| `NEXT_PUBLIC_SOROBAN_RPC_URL` | network default | Override the Soroban RPC endpoint. |
 
 ## Testing
+
+The registry contract is covered by unit tests — both plan modes, every error
+case, and the heir-discovery index:
+
+```bash
+cargo test --manifest-path contracts/Cargo.toml
+```
+
+Fourteen checks, all passing.
 
 The dead man's switch itself is verified against live testnet:
 
@@ -102,8 +172,9 @@ reviewed end to end.
 ## Roadmap
 
 - **L1 — White Belt:** wallet, balance, heartbeat transaction ✓
-- **Next:** an heir registry and the precondition engine that arms and cancels a
-  real plan — added here as each belt lands.
+- **L2 — Yellow Belt:** the registry contract, six wallets, the chest ✓
+- **Next:** the precondition engine that arms and cancels a real plan, with the
+  verification script promoted to a CI suite — added here as each belt lands.
 
 ## Credits
 
