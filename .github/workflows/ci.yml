@@ -28,8 +28,10 @@ jobs:
         with:
           workspaces: contracts
 
+      # --all is not optional: pointed at a virtual workspace manifest without
+      # it, cargo fmt finds no targets and exits without checking anything.
       - name: Formatting
-        run: cargo fmt --manifest-path contracts/Cargo.toml --check
+        run: cargo fmt --all --manifest-path contracts/Cargo.toml --check
 
       - name: Lints
         run: cargo clippy --manifest-path contracts/Cargo.toml --all-targets -- -D warnings

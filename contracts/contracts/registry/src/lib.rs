@@ -261,6 +261,68 @@ impl Registry {
         }
         plans
     }
+
+    /// The heir named by `owner`, if that plan is still in force.
+    ///
+    /// The vault asks this before it will hold a package, so that nothing can
+    /// be sealed against a plan that does not exist, has been called off, or
+    /// names somebody else entirely.
+    pub fn active_heir(env: Env, owner: Address) -> Option<Address> {
+        let plan: Plan = env.storage().persistent().get(&DataKey::Plan(owner))?;
+        match plan.status {
+            Status::Active => Some(plan.heir),
+            Status::Cancelled => None,
+        }
+    }
+
+    /// Whether `owner`'s silence has run its course.
+    ///
+    /// This is the single question the rest of heirloom asks about a plan, and
+    /// it is answered here — by the contract that keeps the record — so that no
+    /// other contract has to know what a plan is made of, or can disagree about
+    /// when a takeover became due.
+    pub fn is_claimable(env: Env, owner: Address) -> bool {
+        let Some(plan) = env
+            .storage()
+            .persistent()
+            .get::<_, Plan>(&DataKey::Plan(owner))
+        else {
+            return false;
+        };
+        if !matches!(plan.status, Status::Active) {
+            return false;
+        }
+        // Saturating: a period long enough to overflow is simply never due.
+        env.ledger().timestamp() >= plan.last_seen.saturating_add(plan.period)
+    }
+
+    /// The owners whose plans name `heir` and whose silence has already run
+    /// out — everything the heir may act on, and nothing they may not.
+    pub fn claimable_for(env: Env, heir: Address) -> Vec<Address> {
+        let now = env.ledger().timestamp();
+        let owners: Vec<Address> = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Heirs(heir.clone()))
+            .unwrap_or_else(|| Vec::new(&env));
+
+        let mut claimable = Vec::new(&env);
+        for owner in owners.iter() {
+            if let Some(plan) = env
+                .storage()
+                .persistent()
+                .get::<_, Plan>(&DataKey::Plan(owner.clone()))
+            {
+                if plan.heir == heir
+                    && matches!(plan.status, Status::Active)
+                    && now >= plan.last_seen.saturating_add(plan.period)
+                {
+                    claimable.push_back(owner);
+                }
+            }
+        }
+        claimable
+    }
 }
 
 mod test;

@@ -233,3 +233,118 @@ fn cancel_requires_owner_auth() {
     assert_eq!(auths.len(), 1);
     assert_eq!(auths[0].0, owner);
 }
+
+// ---- the eligibility reads the vault leans on ----
+
+#[test]
+fn active_heir_names_the_heir_only_while_the_plan_stands() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let client = setup(&env);
+
+    let owner = Address::generate(&env);
+    let heir = Address::generate(&env);
+    let stranger = Address::generate(&env);
+
+    assert_eq!(client.active_heir(&owner), None);
+
+    client.register(&owner, &heir, &1_000u64, &Mode::Standing);
+    assert_eq!(client.active_heir(&owner), Some(heir.clone()));
+    assert_eq!(client.active_heir(&stranger), None);
+
+    client.cancel(&owner);
+    assert_eq!(client.active_heir(&owner), None);
+}
+
+#[test]
+fn is_claimable_turns_true_only_once_the_silence_has_run_out() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let client = setup(&env);
+
+    let owner = Address::generate(&env);
+    let heir = Address::generate(&env);
+
+    env.ledger().set_timestamp(1_000);
+    client.register(&owner, &heir, &500u64, &Mode::Standing);
+
+    assert!(!client.is_claimable(&owner));
+
+    // One second short of due.
+    env.ledger().set_timestamp(1_499);
+    assert!(!client.is_claimable(&owner));
+
+    env.ledger().set_timestamp(1_500);
+    assert!(client.is_claimable(&owner));
+}
+
+#[test]
+fn a_heartbeat_pushes_the_claim_back_out_of_reach() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let client = setup(&env);
+
+    let owner = Address::generate(&env);
+    let heir = Address::generate(&env);
+
+    env.ledger().set_timestamp(1_000);
+    client.register(&owner, &heir, &500u64, &Mode::Standing);
+
+    env.ledger().set_timestamp(1_600);
+    assert!(client.is_claimable(&owner));
+
+    // A sign of life takes it away again.
+    client.heartbeat(&owner);
+    assert!(!client.is_claimable(&owner));
+
+    env.ledger().set_timestamp(2_100);
+    assert!(client.is_claimable(&owner));
+}
+
+#[test]
+fn a_cancelled_plan_is_never_claimable() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let client = setup(&env);
+
+    let owner = Address::generate(&env);
+    let heir = Address::generate(&env);
+
+    env.ledger().set_timestamp(1_000);
+    client.register(&owner, &heir, &500u64, &Mode::Standing);
+    client.cancel(&owner);
+
+    env.ledger().set_timestamp(9_000);
+    assert!(!client.is_claimable(&owner));
+    assert!(client.claimable_for(&heir).is_empty());
+}
+
+#[test]
+fn claimable_for_lists_only_what_the_heir_may_act_on() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let client = setup(&env);
+
+    let due = Address::generate(&env);
+    let waiting = Address::generate(&env);
+    let someone_elses = Address::generate(&env);
+    let heir = Address::generate(&env);
+    let other_heir = Address::generate(&env);
+
+    env.ledger().set_timestamp(1_000);
+    client.register(&due, &heir, &500u64, &Mode::Standing);
+    client.register(&waiting, &heir, &5_000u64, &Mode::Standing);
+    client.register(&someone_elses, &other_heir, &500u64, &Mode::Standing);
+
+    // Past the short silence, nowhere near the long one.
+    env.ledger().set_timestamp(1_600);
+
+    let claimable = client.claimable_for(&heir);
+    assert_eq!(claimable.len(), 1);
+    assert_eq!(claimable.get(0).unwrap(), due);
+
+    // The other heir sees their own, and only their own.
+    let theirs = client.claimable_for(&other_heir);
+    assert_eq!(theirs.len(), 1);
+    assert_eq!(theirs.get(0).unwrap(), someone_elses);
+}
