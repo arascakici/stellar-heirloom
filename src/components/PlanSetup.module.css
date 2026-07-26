@@ -54,9 +54,16 @@
   gap: var(--space-3);
 }
 
-/* Forward is the weighted choice; Back keeps to the width of its word. */
+/*
+ * Forward is the weighted choice; Back keeps to the width of its word.
+ * `min-width: 0` matters: a flex item defaults to min-content width, so without
+ * it the button refuses to shrink and pushes the row past the edge of a phone.
+ * The generous horizontal padding is a laptop luxury and gives way first.
+ */
 .nav .submit {
   flex: 1;
+  min-width: 0;
+  padding-inline: var(--space-4);
 }
 
 .back {

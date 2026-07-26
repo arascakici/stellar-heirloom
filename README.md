@@ -88,9 +88,9 @@ believed, not read from documentation:
 
 ### Screenshots
 
-| Mobile | The pipeline | The tests |
+| Mobile | The pipeline | The contract tests |
 | --- | --- | --- |
-| ![heirloom on a phone](docs/screenshots/l3-mobile.png) | ![CI running both jobs](docs/screenshots/l3-ci.png) | ![Contract and frontend tests passing](docs/screenshots/l3-tests.png) |
+| ![Choosing a delivery on a phone: merge held back, and the trustline standing in its way named](docs/screenshots/l3-mobile.png) | ![Both CI jobs green, with the 42 frontend tests reported in the job summary](docs/screenshots/l3-ci.png) | ![19 registry tests and 15 vault tests, all passing](docs/screenshots/l3-tests.png) |
 
 ## Level 2 — Yellow Belt
 

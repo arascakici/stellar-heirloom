@@ -6,7 +6,7 @@ import { StrKey } from "@stellar/stellar-sdk";
 
 import { formatDuration } from "@/lib/stellar/duration";
 import { canMerge, Delivery } from "@/lib/stellar/envelope";
-import { fetchAccountFacts } from "@/lib/stellar/horizon";
+import { fetchAccountFacts, type AccountFacts } from "@/lib/stellar/horizon";
 import { shortenAddress } from "@/lib/stellar/network";
 import type { TxOutcome } from "@/lib/stellar/outcome";
 import { PlanMode } from "@/lib/stellar/registry";
@@ -103,18 +103,16 @@ export function PlanSetup({ owner, onSealed }: Props) {
    * question is still out; `null` if it could not be answered at all — the two
    * are kept apart so the interface never blocks a choice without saying why.
    */
-  const [subentries, setSubentries] = useState<number | null | undefined>(
-    undefined,
-  );
+  const [facts, setFacts] = useState<AccountFacts | null | undefined>(undefined);
 
   useEffect(() => {
     let cancelled = false;
     fetchAccountFacts(owner)
-      .then((facts) => {
-        if (!cancelled) setSubentries(facts ? facts.subentryCount : null);
+      .then((read) => {
+        if (!cancelled) setFacts(read);
       })
       .catch(() => {
-        if (!cancelled) setSubentries(null);
+        if (!cancelled) setFacts(null);
       });
     return () => {
       cancelled = true;
@@ -133,7 +131,7 @@ export function PlanSetup({ owner, onSealed }: Props) {
     ? BigInt(amountNum) * UNITS[unitIdx].seconds
     : 0n;
 
-  const mergeAllowed = typeof subentries === "number" && canMerge(subentries);
+  const mergeAllowed = !!facts && canMerge(facts.subentryCount);
   // Derived rather than corrected: an account that turns out to carry
   // subentries simply stops having merge as an answer.
   const chosenDelivery =
@@ -295,9 +293,7 @@ export function PlanSetup({ owner, onSealed }: Props) {
                 <span className={styles.modeName}>{option.name}</span>
                 <span className={styles.modeBlurb}>{option.blurb}</span>
                 {blocked && (
-                  <span className={styles.blocked}>
-                    {mergeReason(subentries)}
-                  </span>
+                  <span className={styles.blocked}>{mergeReason(facts)}</span>
                 )}
               </label>
             );
@@ -355,7 +351,7 @@ export function PlanSetup({ owner, onSealed }: Props) {
 
         {step === "review" ? (
           <button type="submit" className={styles.submit} disabled={pending}>
-            {sealing ? SEALING[sealing] : "Seal the plan"}
+            {sealing ? "Sealing…" : "Seal the plan"}
           </button>
         ) : (
           <button
@@ -369,6 +365,17 @@ export function PlanSetup({ owner, onSealed }: Props) {
         )}
       </div>
 
+      {/*
+        Which signature is being asked for lives here, not inside the button:
+        a full sentence will not fit a button on a phone, and shrinking it to
+        fit would only push the row wider than the screen.
+      */}
+      {sealing && (
+        <p className={styles.note} role="status">
+          {SEALING[sealing]}
+        </p>
+      )}
+
       {result && (
         <TransactionResult outcome={result} successLabel="Plan sealed." />
       )}
@@ -377,17 +384,48 @@ export function PlanSetup({ owner, onSealed }: Props) {
 }
 
 /**
- * Never block a choice without saying why. The three cases are genuinely
- * different: still asking, could not ask, and asked and the answer was no.
+ * Never block a choice without saying why — and say what is in the way, not
+ * how many things are. A count leaves someone hunting; a name tells them what
+ * to remove if they want this option.
  */
-function mergeReason(subentries: number | null | undefined): string {
-  if (subentries === undefined) {
-    return "Checking what this account holds…";
-  }
-  if (subentries === null) {
+function mergeReason(facts: AccountFacts | null | undefined): string {
+  if (facts === undefined) return "Checking what this account holds…";
+  if (facts === null) {
     return "This account could not be read just now, so merge is held back rather than offered blindly. Handover works either way.";
   }
-  return `Not available: this account carries ${subentries} ${
-    subentries === 1 ? "trustline or extra signer" : "trustlines or extra signers"
-  }, and the network refuses to merge an account holding anything besides lumens.`;
+
+  const named: string[] = [];
+  if (facts.trustlines.length === 1) {
+    named.push(`a trustline for ${facts.trustlines[0]}`);
+  } else if (facts.trustlines.length > 1) {
+    named.push(`trustlines for ${listOf(facts.trustlines)}`);
+  }
+  if (facts.extraSigners > 0) {
+    named.push(
+      facts.extraSigners === 1
+        ? "an extra signer"
+        : `${facts.extraSigners} extra signers`,
+    );
+  }
+
+  // Offers and data entries are subentries too; if the total exceeds what we
+  // could name, say so rather than quietly under-reporting.
+  const namedCount = facts.trustlines.length + facts.extraSigners;
+  if (namedCount < facts.subentryCount) {
+    named.push(
+      `${facts.subentryCount - namedCount} other entr${
+        facts.subentryCount - namedCount === 1 ? "y" : "ies"
+      } (an open offer, perhaps)`,
+    );
+  }
+
+  return `Not available: this account holds ${listOf(named)}. The network refuses to close an account carrying anything besides lumens — remove ${
+    named.length === 1 ? "it" : "them"
+  } and merge becomes possible.`;
+}
+
+function listOf(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "";
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 }

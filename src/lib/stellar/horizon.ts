@@ -33,6 +33,10 @@ export type AccountFacts = {
    * `op_has_sub_entries`.
    */
   subentryCount: number;
+  /** Asset codes the account holds a trustline for, so they can be named. */
+  trustlines: string[];
+  /** Signers beyond the account's own master key. */
+  extraSigners: number;
 };
 
 export async function fetchAccountFacts(
@@ -40,9 +44,23 @@ export async function fetchAccountFacts(
 ): Promise<AccountFacts | null> {
   try {
     const account = await horizon.loadAccount(address);
+
+    // Naming what stands in the way beats reporting a count. These two cover
+    // most accounts; offers and data entries are left to the total.
+    const trustlines = account.balances
+      .filter((balance) => balance.asset_type !== "native")
+      .map((balance) =>
+        "asset_code" in balance ? balance.asset_code : "an asset",
+      );
+    const extraSigners = account.signers.filter(
+      (signer) => signer.key !== address,
+    ).length;
+
     return {
       sequence: BigInt(account.sequenceNumber()),
       subentryCount: account.subentry_count,
+      trustlines,
+      extraSigners,
     };
   } catch (error) {
     if (isNotFound(error)) return null;
