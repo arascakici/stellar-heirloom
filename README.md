@@ -57,6 +57,12 @@ courier. The heir does not have to be watching. Nor does anyone else.
   found by somebody else. *Merge* sends every lumen into the heir's own wallet
   and closes the account; it is offered only to accounts that can take it, since
   one trustline is enough for the network to refuse.
+- **And a way back.** Plans fire for reasons nobody meant: an illness, a long
+  trip, a forgotten month. After a handover the owner cannot undo it, because
+  their key no longer signs for anything — so the heir can, in one operation
+  that returns the key and gives up their own access. It is the takeover run in
+  reverse, and it is the heir's to offer, which is the trust they were named
+  for.
 - **And a way to finish.** A handover gives the heir control, not possession —
   the balances stay where they were. So the app carries on: it reads what is
   actually in the account, moves it home, and where nothing is left behind

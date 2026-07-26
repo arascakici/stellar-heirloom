@@ -10,6 +10,7 @@ import { controlsAccount } from "@/lib/stellar/horizon";
 import { takeOver, type TakeoverStep } from "@/lib/stellar/takeover";
 import { claimableFor } from "@/lib/stellar/vault";
 
+import { GiveAccountBack } from "./GiveAccountBack";
 import { SweepAccount } from "./SweepAccount";
 import { TransactionResult } from "./TransactionResult";
 import styles from "./HeirPlans.module.css";
@@ -155,6 +156,14 @@ export function HeirPlans({ heir, plans, onClaimed }: Props) {
                     owner={plan.owner}
                     heir={heir}
                     onSwept={() => {
+                      refresh();
+                      onClaimed();
+                    }}
+                  />
+                  <GiveAccountBack
+                    owner={plan.owner}
+                    heir={heir}
+                    onGivenBack={() => {
                       refresh();
                       onClaimed();
                     }}
