@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify:preconditions": "node scripts/verify-preconditions.mjs"
+    "verify:preconditions": "node scripts/verify-preconditions.mjs",
+    "watchtower": "node scripts/watchtower.mjs"
   },
   "dependencies": {
     "@creit.tech/stellar-wallets-kit": "^2.5.0",

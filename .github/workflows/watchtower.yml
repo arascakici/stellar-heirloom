@@ -1,0 +1,40 @@
+name: Watchtower
+
+# Somebody has to carry a package to the network once it comes due. Nobody in
+# particular has to — the transaction is already signed and the chain refuses it
+# early — so this is a convenience running on a schedule, never a dependency. If
+# it stops, an heir simply claims by hand.
+on:
+  schedule:
+    # Hourly. Each run scans about seven hours of ledgers, so a missed run
+    # costs nothing.
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+# One courier at a time; two would only race to submit the same transaction.
+concurrency:
+  group: watchtower
+  cancel-in-progress: false
+
+jobs:
+  deliver:
+    name: Deliver what is due
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Walk the vault
+        env:
+          # Optional. Delivery needs no key at all — this only pays the fee for
+          # writing the receipt afterwards, and its absence costs nothing.
+          STELLAR_WATCHTOWER_SECRET: ${{ secrets.STELLAR_WATCHTOWER_SECRET }}
+        run: node scripts/watchtower.mjs

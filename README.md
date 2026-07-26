@@ -197,6 +197,16 @@ Every push and pull request runs
 | **Registry contract** | `cargo fmt --check`, `cargo clippy -D warnings`, the 14 unit tests, and a build for `wasm32v1-none` — the target the contract actually ships to, so a wasm-only failure can't reach a deploy. The wasm is kept as a build artifact. |
 | **Web app** | `npm ci`, `npm run lint`, `npm test`, `npm run build` on Node 20 — the floor this README promises, rather than the version we happen to develop on. |
 
+A third workflow,
+[`.github/workflows/watchtower.yml`](.github/workflows/watchtower.yml), runs
+hourly and carries any package that has come due to the network. **It holds no
+keys and needs none** — every package was signed by its owner long ago and the
+chain refuses it until the account has truly gone quiet, so delivering one is an
+errand anybody can run. A watcher that cannot act early cannot be trusted
+wrongly, and if it stops running an heir loses nothing: they can still claim by
+hand. Set `STELLAR_WATCHTOWER_SECRET` if you also want it to record the receipt
+on chain, which costs a fee and nothing else.
+
 Deploying is deliberate and never automatic: no push can put a new registry on
 chain. [`.github/workflows/deploy-contract.yml`](.github/workflows/deploy-contract.yml)
 runs only from the Actions tab, only after the word `deploy` is typed into its
