@@ -112,10 +112,28 @@
 }
 
 .radio {
-  /* 1 / -1 rather than 1 / 3: a blocked option carries a third line. */
-  grid-row: 1 / -1;
+  /*
+   * Spans the name and the blurb. Not `1 / -1`: there are no explicit rows
+   * here, so a negative line resolves against an empty explicit grid and
+   * collapses to a single row — which drops the text into the radio's own
+   * column.
+   */
+  grid-row: 1 / 3;
   align-self: center;
   accent-color: var(--brass-500);
+}
+
+/*
+ * Why a delivery is unavailable — a third line, which auto-placement would
+ * otherwise tuck under the radio in column one.
+ */
+.blocked {
+  grid-column: 2;
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--text-faint);
+  text-wrap: pretty;
 }
 
 /* Plain explanation, not a warning — the rust hint above means something else. */

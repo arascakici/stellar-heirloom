@@ -231,7 +231,7 @@ export function PlanSetup({ owner, onSealed }: Props) {
               <span className={styles.modeName}>{option.name}</span>
               <span className={styles.modeBlurb}>{option.blurb}</span>
               {blocked && subentries !== null && subentries > 0 && (
-                <span className={styles.note}>
+                <span className={styles.blocked}>
                   Not available: this account carries {subentries}{" "}
                   {subentries === 1
                     ? "trustline or extra signer"
