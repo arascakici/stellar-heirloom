@@ -235,7 +235,7 @@ Open <http://localhost:3000>, connect a wallet, and — if the account is new �
 click **Fund with test XLM** to have the friendbot faucet create it. Then name an
 heir and seal the plan; **I'm here**, in the account menu, winds the clock back.
 
-heirloom runs on testnet with no configuration. Seven optional variables repoint it:
+heirloom runs on testnet with no configuration. Five optional variables repoint it:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
@@ -244,25 +244,34 @@ heirloom runs on testnet with no configuration. Seven optional variables repoint
 | `NEXT_PUBLIC_SOROBAN_RPC_URL` | network default | Override the Soroban RPC endpoint. |
 | `NEXT_PUBLIC_REGISTRY_ID` | the deployed registry | Point at your own deployment of the record. |
 | `NEXT_PUBLIC_VAULT_ID` | the deployed vault | Point at your own deployment of the vault. |
-| `NEXT_PUBLIC_FEEDBACK_URL` | the live form | Point the feedback footer at your own form. |
-| `NEXT_PUBLIC_FEEDBACK_ADDRESS_FIELD` | `entry.1892039617` | That form's own name for its wallet-address question, used to prefill it. |
 
 ### Feedback
 
-One line under the plate, on both pages, linking out to a short form: whether
-you got a plan sealed, how useful this is, and what should change.
+One folded line under the plate, on both pages. Opened, it is a short form —
+how useful this is, what should change, and which wallet you tried it with —
+answered in place rather than on a page somewhere else. The answers land in a
+Google Form's responses, which is where they are read; only the filling in
+happens here, because handing someone a white Google panel in the middle of a
+dark room tells them they have left the product.
 
-It asks for your wallet address, and asks for it required, because feedback that
-cannot be placed against a plan on the ledger is just an opinion — this way a
-sentence about the sealing step can be read next to the sealing that person
-actually did. When a wallet is connected the address is prefilled rather than
-retyped; the field stays visible and editable on the other side, so you can see
-what is being sent and clear it if you would rather not say.
+The address is required. Feedback that cannot be placed against a plan on the
+ledger is only an opinion, and this way a sentence about the sealing step can be
+read next to the sealing that person actually did. When a wallet is connected it
+is filled in rather than retyped — nobody transcribes fifty-six characters of
+base32 correctly — but it sits in a field you can edit or empty, not carried
+along out of sight. That the address travels at all is a deliberate exception to
+how the rest of this works, and it is worth naming as one: nothing else in
+heirloom asks you to identify yourself, and the count of wallets that have used
+it does not depend on the form. That is on chain, where anyone can count it
+without being shown a dashboard.
 
-That the address travels is a deliberate exception to how the rest of this works,
-and it is worth naming as one. Nothing else here asks you to identify yourself,
-and the count of wallets that have used heirloom does not depend on the form at
-all — it is on chain, where anyone can count it without being shown a dashboard.
+`POST /api/feedback` is the only server route in the project. Not for secrecy —
+the form takes anonymous answers and holds no key — but because a browser cannot
+post to Google Forms and read what came back. The request is cross-origin, so it
+is either refused outright or sent opaquely, where success and failure look
+identical. Telling someone their note was received without knowing would be worse
+than not asking. The route reads the status and says something true. It also
+re-checks everything, since it is reachable by anyone who can send a POST.
 
 ## Testing
 
