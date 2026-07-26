@@ -81,9 +81,29 @@
   color: var(--rust-400);
 }
 
+/* The vault has not answered yet; say so rather than imply an absence. */
+.pending {
+  color: var(--text-faint);
+}
+
 .note {
   font-size: var(--text-xs);
   line-height: var(--leading-snug);
   color: var(--text-faint);
+  text-wrap: pretty;
+}
+
+/*
+ * A plan on the record with no package behind it. It looks healthy and can
+ * never fire, so this is the one line on the card that raises its voice.
+ */
+.warn {
+  padding: var(--space-3);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--rust-300);
+  background-color: rgb(169 74 45 / 0.1);
+  border: 1px solid rgb(169 74 45 / 0.3);
+  border-radius: var(--radius-sm);
   text-wrap: pretty;
 }

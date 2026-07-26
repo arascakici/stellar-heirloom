@@ -76,15 +76,6 @@ export async function plansForHeir(heir: string): Promise<Plan[]> {
   return Array.isArray(raw) ? raw.map((p) => toPlan(p as RawPlan)) : [];
 }
 
-/**
- * Whether this owner's silence has run its course. The rule lives in the
- * contract, so the interface asks rather than recomputing it and risking a
- * different answer.
- */
-export async function isClaimable(owner: string): Promise<boolean> {
-  return (await read("is_claimable", owner, new Address(owner).toScVal())) === true;
-}
-
 /** Record a plan. `owner` is the connected account and must sign. */
 export function register(
   owner: string,
