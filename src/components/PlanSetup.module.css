@@ -97,10 +97,33 @@
   border-color: var(--brass-400);
 }
 
+/*
+ * A delivery the chain would refuse. Shown rather than hidden: knowing merge
+ * exists, and why this account cannot have it, is worth more than a shorter
+ * list.
+ */
+.modeOff {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modeOff:hover {
+  border-color: var(--border);
+}
+
 .radio {
-  grid-row: 1 / 3;
+  /* 1 / -1 rather than 1 / 3: a blocked option carries a third line. */
+  grid-row: 1 / -1;
   align-self: center;
   accent-color: var(--brass-500);
+}
+
+/* Plain explanation, not a warning — the rust hint above means something else. */
+.note {
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--text-faint);
+  text-wrap: pretty;
 }
 
 .modeName {

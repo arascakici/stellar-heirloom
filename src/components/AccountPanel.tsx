@@ -87,7 +87,9 @@ export function AccountPanel() {
   return (
     <div className={styles.panel}>
       <PlanVault owner={address} />
-      {heirPlans.length > 0 && <HeirPlans plans={heirPlans} />}
+      {heirPlans.length > 0 && (
+        <HeirPlans heir={address} plans={heirPlans} onClaimed={refreshPlans} />
+      )}
     </div>
   );
 }

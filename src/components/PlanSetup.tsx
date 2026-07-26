@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { StrKey } from "@stellar/stellar-sdk";
 
+import { canMerge, Delivery } from "@/lib/stellar/envelope";
+import { fetchAccountFacts } from "@/lib/stellar/horizon";
 import type { TxOutcome } from "@/lib/stellar/outcome";
-import { PlanMode, register } from "@/lib/stellar/registry";
+import { PlanMode } from "@/lib/stellar/registry";
+import { sealPlan, type SealStep } from "@/lib/stellar/seal";
 
 import type { PlanDraft } from "./PlanNote";
 import { TransactionResult } from "./TransactionResult";
@@ -30,6 +33,28 @@ const MODES = [
   },
 ];
 
+const DELIVERIES = [
+  {
+    value: Delivery.Handover,
+    name: "Handover",
+    blurb:
+      "Your heir gains control of this account. Nothing moves and nothing is sold — whatever it holds, it keeps holding.",
+  },
+  {
+    value: Delivery.Merge,
+    name: "Merge",
+    blurb:
+      "Every lumen moves into your heir’s own wallet and this account closes for good. Only possible while it holds nothing but XLM.",
+  },
+];
+
+/** What the button says while the three signatures are collected. */
+const STEP_LABEL: Record<SealStep, string> = {
+  recording: "Recording the plan…",
+  signing: "Sign the takeover…",
+  storing: "Sealing the package…",
+};
+
 type Props = {
   owner: string;
   /**
@@ -44,26 +69,61 @@ export function PlanSetup({ owner, onSealed }: Props) {
   const [amount, setAmount] = useState("30");
   const [unitIdx, setUnitIdx] = useState(0);
   const [mode, setMode] = useState<PlanMode>(PlanMode.Standing);
-  const [pending, setPending] = useState(false);
+  const [delivery, setDelivery] = useState<Delivery>(Delivery.Handover);
+  const [step, setStep] = useState<SealStep | null>(null);
   const [result, setResult] = useState<TxOutcome | null>(null);
+  /** null while we have not yet heard back about the account. */
+  const [subentries, setSubentries] = useState<number | null>(null);
+
+  // Whether a merge is even possible depends on what the account carries, so
+  // ask rather than offer something the chain would refuse.
+  useEffect(() => {
+    let cancelled = false;
+    fetchAccountFacts(owner)
+      .then((facts) => {
+        if (!cancelled) setSubentries(facts?.subentryCount ?? 0);
+      })
+      .catch(() => {
+        if (!cancelled) setSubentries(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [owner]);
+
+  const mergeAllowed = subentries !== null && canMerge(subentries);
+  const pending = step !== null;
 
   const trimmedHeir = heir.trim();
   const heirValid = StrKey.isValidEd25519PublicKey(trimmedHeir);
+  const heirIsOwner = trimmedHeir === owner;
   const amountNum = Number(amount);
   const amountValid = Number.isInteger(amountNum) && amountNum > 0;
-  const canSubmit = heirValid && amountValid && !pending;
+  const canSubmit = heirValid && !heirIsOwner && amountValid && !pending;
+
+  // Derived rather than corrected: if the account turns out to carry subentries
+  // — or grows one while the form is open — the merge choice simply stops
+  // being the answer, without a render cascade to walk it back.
+  const chosenDelivery =
+    delivery === Delivery.Merge && !mergeAllowed ? Delivery.Handover : delivery;
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!canSubmit) return;
 
-    setPending(true);
     setResult(null);
 
     const period = BigInt(amountNum) * UNITS[unitIdx].seconds;
-    const outcome = await register(owner, trimmedHeir, period, mode);
+    const outcome = await sealPlan({
+      owner,
+      heir: trimmedHeir,
+      period,
+      mode,
+      delivery: chosenDelivery,
+      onStep: setStep,
+    });
 
-    setPending(false);
+    setStep(null);
 
     if (outcome.ok) {
       onSealed({ heir: trimmedHeir, period, mode });
@@ -92,6 +152,12 @@ export function PlanSetup({ owner, onSealed }: Props) {
         />
         {heir.length > 0 && !heirValid && (
           <span className={styles.hint}>That isn’t a valid Stellar address.</span>
+        )}
+        {heirValid && heirIsOwner && (
+          <span className={styles.hint}>
+            An account cannot inherit from itself. Name a different wallet — a
+            spare of your own will do.
+          </span>
         )}
       </label>
 
@@ -139,8 +205,55 @@ export function PlanSetup({ owner, onSealed }: Props) {
         ))}
       </fieldset>
 
+      <fieldset className={styles.modes}>
+        <legend className={styles.label}>Delivery</legend>
+        {DELIVERIES.map((option) => {
+          const blocked = option.value === Delivery.Merge && !mergeAllowed;
+          return (
+            <label
+              key={option.name}
+              className={[
+                styles.mode,
+                chosenDelivery === option.value ? styles.modeOn : "",
+                blocked ? styles.modeOff : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              <input
+                type="radio"
+                name="delivery"
+                className={styles.radio}
+                checked={chosenDelivery === option.value}
+                disabled={blocked}
+                onChange={() => setDelivery(option.value)}
+              />
+              <span className={styles.modeName}>{option.name}</span>
+              <span className={styles.modeBlurb}>{option.blurb}</span>
+              {blocked && subentries !== null && subentries > 0 && (
+                <span className={styles.note}>
+                  Not available: this account carries {subentries}{" "}
+                  {subentries === 1
+                    ? "trustline or extra signer"
+                    : "trustlines or extra signers"}
+                  , and the network refuses to merge an account holding anything
+                  besides lumens.
+                </span>
+              )}
+            </label>
+          );
+        })}
+      </fieldset>
+
+      <p className={styles.note}>
+        Sealing takes three signatures: one to record the plan, one for the
+        takeover itself — the transaction nobody submits — and one to place it in
+        the vault. They cannot be combined; Stellar allows a single contract call
+        per transaction.
+      </p>
+
       <button type="submit" className={styles.submit} disabled={!canSubmit}>
-        {pending ? "Sealing on chain…" : "Seal the plan"}
+        {step ? STEP_LABEL[step] : "Seal the plan"}
       </button>
 
       {result && (
