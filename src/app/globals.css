@@ -16,6 +16,13 @@ html {
 
 body {
   min-height: 100%;
+  /*
+   * The chest ceremony deliberately overflows its box — the lid lifts past it,
+   * the lock throws shards outward, and breaking the seal scales the whole
+   * thing to 1.55 as it comes forward. None of that should ever be able to
+   * scroll the page sideways.
+   */
+  overflow-x: hidden;
   background-color: var(--surface);
   color: var(--text);
   font-family: var(--font-body);

@@ -17,6 +17,81 @@ Built level-by-level for the **Stellar Builder Challenge**. One repository, one
 product — each belt adds a section here, and earlier levels stay in place as the
 README grows.
 
+## Level 3 — Orange Belt
+
+The plan learns to arrive. Until now heirloom could record who inherits what and
+refuse a takeover that came too early — but somebody still had to be holding the
+signed transaction when the silence finally ran out. Now the transaction lives on
+chain, in the open, in a second contract that asks the first whether the wait is
+over.
+
+Storing it publicly is the point rather than a compromise. The chain refuses the
+transaction until the account has truly gone quiet, so a package anybody can read
+is a package nobody can misuse — and once it *is* due, anybody at all can be the
+courier. The heir does not have to be watching. Nor does anyone else.
+
+| | registry | vault |
+| --- | --- | --- |
+| **Contract** | [`CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU`](https://stellar.expert/explorer/testnet/contract/CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU) | [`CDQIG5JQHNIBVVPO5G5JGHHG7HBDZJ2ZTAIRB3WR2RESYCVPP5G6CMGG`](https://stellar.expert/explorer/testnet/contract/CDQIG5JQHNIBVVPO5G5JGHHG7HBDZJ2ZTAIRB3WR2RESYCVPP5G6CMGG) |
+| **Deploy tx** | [`399e9ae4…`](https://stellar.expert/explorer/testnet/tx/399e9ae4119e16c39859b8505081853b1fcda7d655bf4485cce2877e6c88b684) | [`93dc75f1…`](https://stellar.expert/explorer/testnet/tx/93dc75f10bd0e93c5e00520f8d499cf09ca79ef3c8560642f8be5dfd858faeae) |
+| **A package collected** | — | [`28e66b92…`](https://stellar.expert/explorer/testnet/tx/28e66b92dff988a1777c8897f9eeb3a7af07f9460faef6a4913e2636fe321c66) |
+
+### Features
+
+- **A second contract, and a real conversation between them.** The vault holds
+  the package; the registry holds the record. When a package is sealed the vault
+  asks the registry who the heir is, and refuses a package that names anyone
+  else. When one is claimed it asks whether the silence has run out. The rule
+  lives in one place, so the two can never disagree about when a takeover became
+  due.
+- **The interface is declared, not imported** — `#[contractclient]` on a trait,
+  so the registry's implementation never reaches the vault's wasm. Confirmed:
+  `stellar contract info interface` lists the vault's seven functions and none of
+  the registry's. The tests wire the two together for real, so the cross-contract
+  call is exercised rather than mocked.
+- **Two ways for an account to change hands**, chosen when the plan is sealed.
+  *Handover* makes the heir a signer and stands the owner's key down — assets
+  never move, and it works whatever the account holds. *Merge* sends every lumen
+  into the heir's own wallet and closes the account. Merge is offered only to
+  accounts that can actually take it: one trustline is enough for the network to
+  refuse, so the interface checks before it offers.
+- **An heir's side of the app.** Connect a wallet and see the accounts that named
+  you — and, among them, the ones that have gone quiet long enough to be yours.
+  Which is which is the contract's answer, not a sum the page does. Taking one
+  over submits a transaction the heir never built, never signed, and could not
+  alter.
+- **A watchtower that holds no keys.** An hourly job walks the vault and carries
+  anything due to the network. Delivering a signed transaction needs no
+  signature, so it cannot act early and cannot be trusted wrongly — and if it
+  stops running, an heir loses nothing but the convenience.
+- **CI on every push** — formatting, clippy, 34 contract tests, a `wasm32v1-none`
+  build, then lint, 42 frontend tests and a production build. Deployment is a
+  separate workflow that runs only by hand, only after a typed confirmation, and
+  installs a checksum-pinned toolchain before it is shown a key.
+- **Three signatures, said out loud.** Sealing records the plan, signs the
+  takeover, and stores it — Stellar allows one contract call per transaction, so
+  they cannot be folded together. The form says so rather than springing three
+  wallet prompts on someone expecting one.
+
+### Verified on chain
+
+Every rule this level added was proven against live testnet before it was
+believed, not read from documentation:
+
+| Claim | How it was shown |
+| --- | --- |
+| A pre-signed `AccountMerge` honours `minSeqAge` | refused while active, accepted after the silence, every lumen landing in the heir's wallet |
+| A merge cannot close an account with subentries | one trustline → `tx_failed` / `op_has_sub_entries` |
+| The vault really does ask the registry | `seal` succeeds only against a plan the registry confirms |
+| A package is refused before its time | `Error(Contract, #6)` — `NotYet` |
+| **A sealed plan survives being stored** | the subtle one: a sealed takeover claims the *next* sequence number, and storing it spends one. Built naively it would void itself on the spot. Built against the sequence the account will be on afterwards, it lands ([`d98711c0…`](https://stellar.expert/explorer/testnet/tx/d98711c06042d1ccaaff141ff54ac4ca7c882a5d1c0a4c2fc1259e0a2deebf74)) |
+
+### Screenshots
+
+| Mobile | The pipeline | The tests |
+| --- | --- | --- |
+| ![heirloom on a phone](docs/screenshots/l3-mobile.png) | ![CI running both jobs](docs/screenshots/l3-ci.png) | ![Contract and frontend tests passing](docs/screenshots/l3-tests.png) |
+
 ## Level 2 — Yellow Belt
 
 The plan goes on chain. A Soroban contract written in Rust keeps the **record** —
@@ -118,7 +193,8 @@ leaves the account but the fee; the point is the on-chain record.
 
 ### Prerequisites
 
-- [ ] Node.js 20 or newer
+- [ ] Node.js 22 or newer — `@stellar/stellar-sdk` 16 requires it, whatever
+      Next.js alone would settle for
 - [ ] A Stellar wallet set to **Testnet** — [Freighter](https://www.freighter.app/),
       xBull, Albedo, LOBSTR, Rabet or Hana. In Freighter that is
       settings → Network → Test Net.
@@ -195,7 +271,7 @@ Every push and pull request runs
 | Job | What it checks |
 | --- | --- |
 | **Registry contract** | `cargo fmt --check`, `cargo clippy -D warnings`, the 14 unit tests, and a build for `wasm32v1-none` — the target the contract actually ships to, so a wasm-only failure can't reach a deploy. The wasm is kept as a build artifact. |
-| **Web app** | `npm ci`, `npm run lint`, `npm test`, `npm run build` on Node 20 — the floor this README promises, rather than the version we happen to develop on. |
+| **Web app** | `npm ci`, `npm run lint`, `npm test`, `npm run build` on Node 22 — the floor the Stellar SDK actually requires, rather than the version we happen to develop on. |
 
 A third workflow,
 [`.github/workflows/watchtower.yml`](.github/workflows/watchtower.yml), runs
@@ -225,8 +301,10 @@ reviewed end to end.
 
 - **L1 — White Belt:** wallet, balance, heartbeat transaction ✓
 - **L2 — Yellow Belt:** the registry contract, six wallets, the chest ✓
-- **Next:** the precondition engine that arms and cancels a real plan, with the
-  verification script promoted to a CI suite — added here as each belt lands.
+- **L3 — Orange Belt:** the vault, both delivery modes, the heir's side, CI and
+  the watchtower ✓
+- **Next:** the whole thing as one product — a guided setup, a fuller dashboard,
+  and the verification script promoted to a scheduled suite.
 
 ## Credits
 

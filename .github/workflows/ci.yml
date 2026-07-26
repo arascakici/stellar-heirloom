@@ -57,12 +57,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 20.9 is what Next requires and what the README promises; proving the
-      # floor is more useful than proving the version we happen to develop on.
+      # 22 is the real floor: Next asks for 20.9 but @stellar/stellar-sdk 16
+      # declares `node >=22`, and running below it only earns EBADENGINE
+      # warnings on the package the whole app is built around.
       - name: Install Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install
