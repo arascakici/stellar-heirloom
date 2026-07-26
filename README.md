@@ -38,6 +38,10 @@ The contract's interface, storage and events are documented in
 upload and create hashes, redeploy steps — in
 [`contracts/deployments.md`](contracts/deployments.md).
 
+> The registry was redeployed at Level 3 to add the reads the vault needs, so
+> the app now talks to a newer address. The one above is what Level 2 shipped
+> and is still on chain, holding everything it witnessed.
+
 ### Features
 
 - **The registry contract** — `register`, `heartbeat` and `cancel` behind the
@@ -144,7 +148,8 @@ heirloom runs on testnet with no configuration. Four optional variables repoint 
 | `NEXT_PUBLIC_STELLAR_NETWORK` | `testnet` | `testnet` or `mainnet`. |
 | `NEXT_PUBLIC_HORIZON_URL` | network default | Override the Horizon endpoint. |
 | `NEXT_PUBLIC_SOROBAN_RPC_URL` | network default | Override the Soroban RPC endpoint. |
-| `NEXT_PUBLIC_REGISTRY_ID` | the deployed registry | Point at your own deployment of the contract. |
+| `NEXT_PUBLIC_REGISTRY_ID` | the deployed registry | Point at your own deployment of the record. |
+| `NEXT_PUBLIC_VAULT_ID` | the deployed vault | Point at your own deployment of the vault. |
 
 ## Testing
 

@@ -1,6 +1,48 @@
 # Deployments
 
-## registry — Testnet
+Testnet only. Newest first — earlier deployments stay listed, because the events
+they witnessed are still on chain and still readable at their addresses.
+
+## registry + vault — 26 July 2026
+
+The registry gained the three eligibility reads the vault leans on
+(`active_heir`, `is_claimable`, `claimable_for`). The earlier instance carries no
+upgrade path, so it was redeployed rather than migrated; plans recorded against
+the old address stayed with it.
+
+| | registry | vault |
+|---|---|---|
+| **Contract ID** | `CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU` | `CDQIG5JQHNIBVVPO5G5JGHHG7HBDZJ2ZTAIRB3WR2RESYCVPP5G6CMGG` |
+| **Explorer** | [stellar.expert](https://stellar.expert/explorer/testnet/contract/CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU) | [stellar.expert](https://stellar.expert/explorer/testnet/contract/CDQIG5JQHNIBVVPO5G5JGHHG7HBDZJ2ZTAIRB3WR2RESYCVPP5G6CMGG) |
+| **Deploy tx** | [`399e9ae4…`](https://stellar.expert/explorer/testnet/tx/399e9ae4119e16c39859b8505081853b1fcda7d655bf4485cce2877e6c88b684) | [`93dc75f1…`](https://stellar.expert/explorer/testnet/tx/93dc75f10bd0e93c5e00520f8d499cf09ca79ef3c8560642f8be5dfd858faeae) |
+
+The vault takes the registry's address in its constructor and cannot be
+repointed afterwards, so the registry has to go first.
+
+### Verified live
+
+The cross-contract path was exercised on chain, not only in the SDK's simulated
+environment:
+
+| Check | Result |
+|---|---|
+| `vault.registry_address()` | returns the registry above |
+| `vault.seal(…)` against a real plan | succeeds — the vault asked `active_heir` and was answered |
+| `vault.claim(…)` before the silence | `Error(Contract, #6)` — `NotYet` |
+| `vault.claimable_for(heir)` before | `[]` |
+| `registry.is_claimable(owner)` after 60s | `true` |
+| `vault.claimable_for(heir)` after | `[owner]` |
+| `vault.claim(…)` after | [`28e66b92…`](https://stellar.expert/explorer/testnet/tx/28e66b92dff988a1777c8897f9eeb3a7af07f9460faef6a4913e2636fe321c66) — `Claimed` emitted, package returned intact |
+
+The `AccountMerge` delivery mode was proven separately: refused while the account
+is active, accepted after the silence, every lumen landing in the heir's own
+wallet, and refused outright for an account carrying a trustline
+([`85d62946…`](https://stellar.expert/explorer/testnet/tx/85d62946a24a3a81644999820c694fdfb8938f669eada887e9544257a02d1f05)).
+
+## registry — 23 July 2026 (superseded)
+
+The first registry, without the eligibility reads. Still on chain; what it
+witnessed remains readable at its address.
 
 | | |
 |---|---|
@@ -9,8 +51,6 @@
 | **Network** | Test SDF Network ; September 2015 |
 | **Explorer** | [stellar.expert](https://stellar.expert/explorer/testnet/contract/CBIBPVG7QXJWUWIFOL3LZRIR37YYKBOAM5YIUEP74RJHB35YXT2OKXTG) |
 
-### Transactions
-
 | What | Hash |
 |---|---|
 | Upload wasm | [`acda6918…`](https://stellar.expert/explorer/testnet/tx/acda69185323780d7385d2578b721d6dbc8ebe329b5cb1584181a0f037cc61d4) |
@@ -18,14 +58,24 @@
 | `register` call (sample) | [`f8121bbe…`](https://stellar.expert/explorer/testnet/tx/f8121bbe5e06e0d96ac6b84728109a23c7236541d06e3fdf16aaca23c6a9ebfd) |
 
 The sample `register` recorded a 30-day Standing plan and emitted a `registered`
-event; `get_plan` reads it back with `status = Active`. Both the write and the
-read are verified live on testnet.
+event; `get_plan` read it back with `status = Active`.
 
-### Redeploy
+## Redeploy
 
 ```bash
 stellar contract build --manifest-path contracts/Cargo.toml
+
 stellar contract deploy \
   --wasm contracts/target/wasm32v1-none/release/registry.wasm \
   --source <your-identity> --network testnet
+
+stellar contract deploy \
+  --wasm contracts/target/wasm32v1-none/release/vault.wasm \
+  --source <your-identity> --network testnet \
+  -- --registry <the id printed above>
 ```
+
+Point the frontend at a new pair with `NEXT_PUBLIC_REGISTRY_ID` and
+`NEXT_PUBLIC_VAULT_ID`; the ids in `src/lib/stellar/` are only fallbacks. The
+same deployment runs from CI — see
+[`.github/workflows/deploy-contract.yml`](../.github/workflows/deploy-contract.yml).
