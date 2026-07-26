@@ -1,6 +1,7 @@
 "use client";
 
 import { formatDuration, humanizeApprox } from "@/lib/stellar/duration";
+import { Delivery } from "@/lib/stellar/envelope";
 import type { RegistryEvent } from "@/lib/stellar/events";
 import { explorerTxUrl, shortenAddress } from "@/lib/stellar/network";
 import { useAccountPlans } from "@/lib/stellar/PlanProvider";
@@ -114,6 +115,35 @@ function Sentence({ event, mine }: { event: RegistryEvent; mine: boolean }) {
       return (
         <>
           <span className={whoClass}>{who}</span> broke the seal.
+        </>
+      );
+    case "sealed":
+      return (
+        <>
+          <span className={whoClass}>{who}</span> left a package for{" "}
+          <span className={`${styles.who} mono`}>
+            {shortenAddress(event.heir ?? "", 4)}
+          </span>
+          {event.delivery === Delivery.Merge
+            ? ", to be merged into their wallet."
+            : ", to hand the account over."}
+        </>
+      );
+    case "unsealed":
+      return (
+        <>
+          <span className={whoClass}>{who}</span> took the package back.
+        </>
+      );
+    case "claimed":
+      // The moment the whole thing exists for.
+      return (
+        <>
+          <span className={`${styles.who} mono`}>
+            {shortenAddress(event.heir ?? "", 4)}
+          </span>{" "}
+          collected the package left by{" "}
+          <span className={whoClass}>{who}</span>.
         </>
       );
   }

@@ -1,22 +1,34 @@
 import { rpc, scValToNative, type xdr } from "@stellar/stellar-sdk";
 
+import type { Delivery } from "./envelope";
 import { PlanMode, REGISTRY_ID } from "./registry";
 import { soroban } from "./soroban";
+import { VAULT_ID } from "./vault";
 
 /**
- * What the registry has witnessed.
+ * What the registry has witnessed — the record and the vault together, since
+ * to anyone reading the book they are one story.
  *
- * The contract publishes three events, each naming the parties in its topics so
- * they can be filtered without decoding the body:
+ * Six events, each naming the parties in its topics so they can be filtered
+ * without decoding the body:
  *
  *   registered — topics [name, owner, heir], body { period, mode }
  *   heartbeat  — topics [name, owner],       body { last_seen }
  *   cancelled  — topics [name, owner, heir], body {}
+ *   sealed     — topics [name, owner, heir], body { delivery }
+ *   unsealed   — topics [name, owner, heir], body {}
+ *   claimed    — topics [name, owner, heir], body { delivery }
  *
- * These shapes are not guessed: they were read back off testnet from real
- * emissions before this decoder was written.
+ * These shapes are not guessed: each was read back off testnet from a real
+ * emission before this decoder was written.
  */
-export type RegistryEventKind = "registered" | "heartbeat" | "cancelled";
+export type RegistryEventKind =
+  | "registered"
+  | "heartbeat"
+  | "cancelled"
+  | "sealed"
+  | "unsealed"
+  | "claimed";
 
 export type RegistryEvent = {
   /** RPC's own id, unique and ordered — safe as a React key and a cursor. */
@@ -28,6 +40,8 @@ export type RegistryEvent = {
   period: bigint | null;
   mode: PlanMode | null;
   lastSeen: bigint | null;
+  /** How the account is to change hands — on the vault's events only. */
+  delivery: Delivery | null;
   ledger: number;
   /** When the ledger closed, ISO-8601. */
   at: string;
@@ -48,7 +62,14 @@ export type EventPage = {
  */
 const LOOKBACK_LEDGERS = 5_000;
 
-const KINDS: RegistryEventKind[] = ["registered", "heartbeat", "cancelled"];
+const KINDS: RegistryEventKind[] = [
+  "registered",
+  "heartbeat",
+  "cancelled",
+  "sealed",
+  "unsealed",
+  "claimed",
+];
 
 function isKind(value: unknown): value is RegistryEventKind {
   return (
@@ -92,6 +113,8 @@ export function toRegistryEvent(
     period: typeof body.period === "bigint" ? body.period : null,
     mode: typeof body.mode === "number" ? (body.mode as PlanMode) : null,
     lastSeen: typeof body.last_seen === "bigint" ? body.last_seen : null,
+    delivery:
+      typeof body.delivery === "number" ? (body.delivery as Delivery) : null,
     ledger: raw.ledger,
     at: raw.ledgerClosedAt,
     txHash: raw.txHash,
@@ -105,8 +128,10 @@ export function toRegistryEvent(
 export async function fetchRegistryEvents(
   cursor?: string | null,
 ): Promise<EventPage> {
+  // Both contracts in one filter: RPC allows several ids, and asking twice
+  // would only mean two windows to keep in step.
   const filters = [
-    { type: "contract" as const, contractIds: [REGISTRY_ID] },
+    { type: "contract" as const, contractIds: [REGISTRY_ID, VAULT_ID] },
   ];
 
   const request = cursor

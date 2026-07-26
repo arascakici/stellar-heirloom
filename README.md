@@ -60,6 +60,11 @@ courier. The heir does not have to be watching. Nor does anyone else.
   Which is which is the contract's answer, not a sum the page does. Taking one
   over submits a transaction the heir never built, never signed, and could not
   alter.
+- **One book for both contracts.** `/registry` polls Soroban RPC for the
+  registry *and* the vault in a single filter and writes the six events out as
+  sentences — a plan recorded, a clock wound, a seal broken, a package left,
+  taken back, or collected. A collection gets the only mark on the page that
+  cannot be undone.
 - **A watchtower that holds no keys.** An hourly job walks the vault and carries
   anything due to the network. Delivering a signed transaction needs no
   signature, so it cannot act early and cannot be trusted wrongly — and if it

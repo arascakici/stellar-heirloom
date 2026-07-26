@@ -1,6 +1,7 @@
 import { Keypair, nativeToScVal, type rpc, type xdr } from "@stellar/stellar-sdk";
 import { describe, expect, it } from "vitest";
 
+import { Delivery } from "./envelope";
 import { concerns, toRegistryEvent, type RegistryEvent } from "./events";
 import { PlanMode } from "./registry";
 
@@ -111,6 +112,59 @@ describe("decoding what the registry published", () => {
     expect(event.ledger).toBe(3_782_000);
     expect(event.at).toBe("2026-07-25T18:00:00Z");
     expect(event.txHash).toMatch(/^f8121bbe/);
+  });
+});
+
+describe("decoding what the vault published", () => {
+  const withDelivery = (name: string, delivery: number) =>
+    rawEvent(
+      [symbol(name), addr(OWNER), addr(HEIR)],
+      nativeToScVal(
+        { delivery },
+        { type: { delivery: ["symbol", "u32"] } },
+      ),
+    );
+
+  it("reads a package being sealed, and how it will be delivered", () => {
+    const event = toRegistryEvent(withDelivery("sealed", 0))!;
+
+    expect(event.kind).toBe("sealed");
+    expect(event.owner).toBe(OWNER);
+    expect(event.heir).toBe(HEIR);
+    expect(event.delivery).toBe(Delivery.Handover);
+  });
+
+  it("tells the two deliveries apart", () => {
+    expect(toRegistryEvent(withDelivery("sealed", 1))!.delivery).toBe(
+      Delivery.Merge,
+    );
+  });
+
+  it("reads a package taken back, which carries no body", () => {
+    const event = toRegistryEvent(
+      rawEvent(
+        [symbol("unsealed"), addr(OWNER), addr(HEIR)],
+        nativeToScVal({}, { type: {} }),
+      ),
+    )!;
+
+    expect(event.kind).toBe("unsealed");
+    expect(event.heir).toBe(HEIR);
+    expect(event.delivery).toBeNull();
+  });
+
+  it("reads a package collected — the one entry that cannot be undone", () => {
+    const event = toRegistryEvent(withDelivery("claimed", 1))!;
+
+    expect(event.kind).toBe("claimed");
+    expect(event.owner).toBe(OWNER);
+    expect(event.heir).toBe(HEIR);
+    expect(event.delivery).toBe(Delivery.Merge);
+  });
+
+  it("leaves delivery null on the registry's own events", () => {
+    expect(toRegistryEvent(registered())!.delivery).toBeNull();
+    expect(toRegistryEvent(heartbeat())!.delivery).toBeNull();
   });
 });
 

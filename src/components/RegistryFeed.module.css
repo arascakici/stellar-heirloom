@@ -68,6 +68,28 @@
   background-color: var(--rust-400);
 }
 
+/* A package going into the vault is of a piece with recording the plan. */
+.entry[data-kind="sealed"] .mark {
+  background-color: var(--brass-400);
+}
+
+/* Taking one back out is an undoing, like breaking the seal. */
+.entry[data-kind="unsealed"] .mark {
+  background-color: var(--rust-400);
+}
+
+/*
+ * A collection is the one entry that cannot be undone — an account has
+ * changed hands. Rust, and a filled mark rather than a dot, so the eye finds
+ * it before it reads the line.
+ */
+.entry[data-kind="claimed"] .mark {
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: var(--rust-400);
+  box-shadow: 0 0 0 3px rgb(169 74 45 / 0.18);
+}
+
 .line {
   text-wrap: pretty;
 }
