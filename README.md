@@ -148,14 +148,28 @@ heirloom runs on testnet with no configuration. Four optional variables repoint 
 
 ## Testing
 
-The registry contract is covered by unit tests — both plan modes, every error
-case, and the heir-discovery index:
+The contracts are covered by unit tests — both plan modes, every error case, the
+heir-discovery index, and the vault wired to a real registry so the
+cross-contract call is exercised rather than mocked:
 
 ```bash
 cargo test --manifest-path contracts/Cargo.toml
 ```
 
-Fourteen checks, all passing.
+Thirty-four checks, all passing.
+
+The frontend's chain logic is covered by Vitest — how a takeover transaction is
+built for each mode and delivery, how a period is phrased, and how the
+registry's events decode:
+
+```bash
+npm test          # once
+npm run test:watch
+```
+
+Thirty-seven checks. The event tests rebuild genuine `ScVal`s rather than
+mocking the decoder's input, so a change in how the contract publishes would
+fail them rather than slip past.
 
 The dead man's switch itself is verified against live testnet:
 
@@ -176,7 +190,7 @@ Every push and pull request runs
 | Job | What it checks |
 | --- | --- |
 | **Registry contract** | `cargo fmt --check`, `cargo clippy -D warnings`, the 14 unit tests, and a build for `wasm32v1-none` — the target the contract actually ships to, so a wasm-only failure can't reach a deploy. The wasm is kept as a build artifact. |
-| **Web app** | `npm ci`, `npm run lint`, `npm run build` on Node 20 — the floor this README promises, rather than the version we happen to develop on. |
+| **Web app** | `npm ci`, `npm run lint`, `npm test`, `npm run build` on Node 20 — the floor this README promises, rather than the version we happen to develop on. |
 
 Deploying is deliberate and never automatic: no push can put a new registry on
 chain. [`.github/workflows/deploy-contract.yml`](.github/workflows/deploy-contract.yml)

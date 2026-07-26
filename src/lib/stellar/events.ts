@@ -56,8 +56,15 @@ function isKind(value: unknown): value is RegistryEventKind {
   );
 }
 
-/** Decode one raw event, or null if it is not one of ours. */
-function toRegistryEvent(raw: rpc.Api.EventResponse): RegistryEvent | null {
+/**
+ * Decode one raw event, or null if it is not one of ours.
+ *
+ * Exported for its tests: this is where a change in the contract's event shape
+ * would show up first, and it is worth pinning down without a network in the way.
+ */
+export function toRegistryEvent(
+  raw: rpc.Api.EventResponse,
+): RegistryEvent | null {
   let topics: unknown[];
   let body: Record<string, unknown>;
 
