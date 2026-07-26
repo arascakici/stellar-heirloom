@@ -68,6 +68,27 @@ export async function fetchAccountFacts(
   }
 }
 
+/**
+ * Whether `heir` can already sign for `owner` — that is, whether the takeover
+ * has happened. It is what tells a list of plans apart from a list of accounts
+ * waiting to be emptied, and it survives a reload in a way component state
+ * never could.
+ */
+export async function controlsAccount(
+  owner: string,
+  heir: string,
+): Promise<boolean> {
+  try {
+    const account = await horizon.loadAccount(owner);
+    return account.signers.some(
+      (signer) => signer.key === heir && signer.weight > 0,
+    );
+  } catch {
+    // A merged account is gone entirely, which is the other happy ending.
+    return false;
+  }
+}
+
 export function isNotFound(error: unknown): boolean {
   return (
     typeof error === "object" &&

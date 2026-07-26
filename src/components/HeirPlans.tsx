@@ -6,9 +6,11 @@ import { formatDuration } from "@/lib/stellar/duration";
 import { shortenAddress } from "@/lib/stellar/network";
 import type { TxOutcome } from "@/lib/stellar/outcome";
 import { PlanMode, type Plan } from "@/lib/stellar/registry";
+import { controlsAccount } from "@/lib/stellar/horizon";
 import { takeOver, type TakeoverStep } from "@/lib/stellar/takeover";
 import { claimableFor } from "@/lib/stellar/vault";
 
+import { SweepAccount } from "./SweepAccount";
 import { TransactionResult } from "./TransactionResult";
 import styles from "./HeirPlans.module.css";
 
@@ -36,27 +38,50 @@ type Props = {
 
 export function HeirPlans({ heir, plans, onClaimed }: Props) {
   const [claimable, setClaimable] = useState<Set<string>>(new Set());
+  /** Accounts this heir can already sign for — the takeover has happened. */
+  const [controlled, setControlled] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState<string | null>(null);
   const [step, setStep] = useState<TakeoverStep | null>(null);
   const [result, setResult] = useState<{ owner: string; outcome: TxOutcome } | null>(
     null,
   );
 
+  // A stable key for the accounts in this list, so the effect below re-runs
+  // when the plans genuinely change rather than on every render.
+  const ownerKey = plans.map((plan) => plan.owner).join(",");
+
   // Which of these are actually due is the vault's answer, not a sum we do
   // here — the contract asks the registry, and the registry owns the rule.
+  // Which have already been taken is the chain's answer too: an account whose
+  // signers include this heir has changed hands, whatever this session knows.
   const refresh = useCallback(() => {
     let cancelled = false;
+    const owners = ownerKey ? ownerKey.split(",") : [];
+
     claimableFor(heir)
-      .then((owners) => {
-        if (!cancelled) setClaimable(new Set(owners));
+      .then((due) => {
+        if (!cancelled) setClaimable(new Set(due));
       })
       .catch(() => {
         if (!cancelled) setClaimable(new Set());
       });
+
+    Promise.all(
+      owners.map((owner) =>
+        controlsAccount(owner, heir).then((yes) => (yes ? owner : null)),
+      ),
+    )
+      .then((held) => {
+        if (!cancelled) setControlled(new Set(held.filter(Boolean) as string[]));
+      })
+      .catch(() => {
+        if (!cancelled) setControlled(new Set());
+      });
+
     return () => {
       cancelled = true;
     };
-  }, [heir]);
+  }, [heir, ownerKey]);
 
   useEffect(refresh, [refresh]);
 
@@ -94,19 +119,23 @@ export function HeirPlans({ heir, plans, onClaimed }: Props) {
       </p>
       <ul className={styles.list}>
         {plans.map((plan) => {
-          const due = claimable.has(plan.owner);
+          const held = controlled.has(plan.owner);
+          // An account already taken is past being due; what it needs now is
+          // emptying, not claiming.
+          const due = !held && claimable.has(plan.owner);
           return (
             <li
               key={plan.owner}
               className={styles.item}
-              data-due={due ? "" : undefined}
+              data-due={due || held ? "" : undefined}
             >
               <span className={`${styles.owner} mono`} title={plan.owner}>
                 {shortenAddress(plan.owner, 6)}
               </span>
               <span className={styles.meta}>
-                {plan.mode === PlanMode.Sealed ? "Sealed" : "Standing"} ·{" "}
-                {formatDuration(plan.period)} of silence
+                {held
+                  ? "Yours — signed for by your wallet"
+                  : `${plan.mode === PlanMode.Sealed ? "Sealed" : "Standing"} · ${formatDuration(plan.period)} of silence`}
               </span>
               {due && (
                 <button
@@ -119,6 +148,18 @@ export function HeirPlans({ heir, plans, onClaimed }: Props) {
                     ? STEP_LABEL[step]
                     : "Take over"}
                 </button>
+              )}
+              {held && (
+                <div className={styles.result}>
+                  <SweepAccount
+                    owner={plan.owner}
+                    heir={heir}
+                    onSwept={() => {
+                      refresh();
+                      onClaimed();
+                    }}
+                  />
+                </div>
               )}
               {result?.owner === plan.owner && (
                 <div className={styles.result}>

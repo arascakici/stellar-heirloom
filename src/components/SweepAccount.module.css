@@ -1,0 +1,93 @@
+.sweep {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+  text-align: left;
+}
+
+.status {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+.done {
+  margin-top: var(--space-3);
+}
+
+.lead {
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* What is actually being moved, in the face reserved for chain figures. */
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.amount {
+  font-size: var(--text-sm);
+  color: var(--accent-bright);
+  overflow-wrap: anywhere;
+}
+
+.what {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  letter-spacing: 0.06em;
+}
+
+.note {
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--text-faint);
+  text-wrap: pretty;
+}
+
+/* Something that cannot be moved is a caution, not a failure. */
+.stuck {
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--rust-400);
+  text-wrap: pretty;
+}
+
+.act {
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  color: var(--wood-950);
+  background-color: var(--brass-400);
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    opacity 120ms ease;
+}
+
+.act:hover:not(:disabled) {
+  background-color: var(--brass-300);
+}
+
+.act:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
