@@ -27,6 +27,18 @@ import type { TxFailureReason, TxOutcome } from "./outcome";
 /** Every Stellar account locks half a lumen per subentry, plus two for itself. */
 const BASE_RESERVE = 0.5;
 
+/**
+ * What the sweep bids for its own fee, and therefore what has to be left behind
+ * to pay it.
+ *
+ * This is easy to forget and fails loudly when you do: paying out everything
+ * above the reserve leaves the account exactly at the reserve, and then the fee
+ * pushes it under. The network answers `op_underfunded` — not because the
+ * balance moved, but because the sum never added up.
+ */
+const FEE_STROOPS = Number(BASE_FEE) * 100;
+const FEE_XLM = FEE_STROOPS / 10_000_000;
+
 export type SweepAsset = {
   code: string;
   issuer: string;
@@ -109,8 +121,12 @@ export async function planSweep(
   const total = Number(native?.balance ?? "0");
   const reserve = (2 + source.subentry_count) * BASE_RESERVE;
 
+  // The fee comes out of this account either way, so it is never part of what
+  // moves. A merge carries the reserve across; a payment has to leave it.
+  const movable = closes ? total - FEE_XLM : total - reserve - FEE_XLM;
+
   return {
-    xlm: closes ? total.toFixed(7) : Math.max(total - reserve, 0).toFixed(7),
+    xlm: Math.max(movable, 0).toFixed(7),
     moving,
     stuck,
     closes,
@@ -131,8 +147,9 @@ export async function sweep(owner: string, heir: string): Promise<TxOutcome> {
     const builder = new TransactionBuilder(source, {
       // A transaction must bid at least one base fee per operation, and the
       // count is not known until they are added. Bidding for the maximum
-      // hundred costs a thousandth of a lumen and only what is needed is taken.
-      fee: String(Number(BASE_FEE) * 100),
+      // hundred costs a thousandth of a lumen; the plan above holds back
+      // exactly this much so the bid is always covered.
+      fee: String(FEE_STROOPS),
       networkPassphrase: network.passphrase,
     });
 
