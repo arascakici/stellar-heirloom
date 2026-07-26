@@ -31,6 +31,11 @@ pub enum Delivery {
     /// account ceases to exist. Only possible while the account carries no
     /// subentries, and it takes nothing but XLM with it.
     Merge = 1,
+    /// `SetOptions` again, but the owner's key keeps its weight: the heir joins
+    /// rather than replaces. Nobody is ever locked out of their own account by
+    /// a silence they did not mean — which matters most when the heir is a
+    /// spare wallet of your own.
+    Joint = 2,
 }
 
 /// A sealed package: signed, unsubmitted, waiting.

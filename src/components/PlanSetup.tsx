@@ -48,10 +48,16 @@ const MODES = [
 
 const DELIVERIES = [
   {
+    value: Delivery.Joint,
+    name: "Joint",
+    blurb:
+      "Your heir joins the account and your own key keeps working. A silence you didn’t mean can never lock you out — the safest choice when the heir is a spare wallet of your own.",
+  },
+  {
     value: Delivery.Handover,
     name: "Handover",
     blurb:
-      "Your heir gains control of this account. Nothing moves and nothing is sold — whatever it holds, it keeps holding.",
+      "Your heir takes the account over and your key stands down for good. Choose this if the old key might one day fall into someone else’s hands.",
   },
   {
     value: Delivery.Merge,
@@ -94,7 +100,8 @@ export function PlanSetup({ owner, onSealed }: Props) {
   const [amount, setAmount] = useState("30");
   const [unitIdx, setUnitIdx] = useState(0);
   const [mode, setMode] = useState<PlanMode>(PlanMode.Standing);
-  const [delivery, setDelivery] = useState<Delivery>(Delivery.Handover);
+  // Joint by default: it is the only mode that cannot lock anyone out.
+  const [delivery, setDelivery] = useState<Delivery>(Delivery.Joint);
   const [sealing, setSealing] = useState<SealStep | null>(null);
   const [result, setResult] = useState<TxOutcome | null>(null);
 
@@ -135,7 +142,7 @@ export function PlanSetup({ owner, onSealed }: Props) {
   // Derived rather than corrected: an account that turns out to carry
   // subentries simply stops having merge as an answer.
   const chosenDelivery =
-    delivery === Delivery.Merge && !mergeAllowed ? Delivery.Handover : delivery;
+    delivery === Delivery.Merge && !mergeAllowed ? Delivery.Joint : delivery;
 
   const stepReady =
     step === "heir"
@@ -323,7 +330,8 @@ export function PlanSetup({ owner, onSealed }: Props) {
             <div className={styles.row}>
               <dt className={styles.label}>Delivery</dt>
               <dd className={styles.value}>
-                {chosenDelivery === Delivery.Merge ? "Merge" : "Handover"}
+                {DELIVERIES.find((option) => option.value === chosenDelivery)
+                  ?.name ?? "Joint"}
               </dd>
             </div>
           </dl>

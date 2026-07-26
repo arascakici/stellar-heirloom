@@ -3,6 +3,24 @@
 Testnet only. Newest first — earlier deployments stay listed, because the events
 they witnessed are still on chain and still readable at their addresses.
 
+## vault — 26 July 2026 (current)
+
+`Delivery` gained a third mode, `Joint`, so the vault was redeployed. The
+registry is unchanged and keeps its address, so the new vault was pointed at the
+same one.
+
+| | |
+|---|---|
+| **Contract ID** | `CB55KTVZ7QINEKSXDTALKEIEJWW4DHLIGZPM4SANDG3UGF7XKDIPU7JQ` |
+| **Registry** | `CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU` (unchanged) |
+| **Explorer** | [stellar.expert](https://stellar.expert/explorer/testnet/contract/CB55KTVZ7QINEKSXDTALKEIEJWW4DHLIGZPM4SANDG3UGF7XKDIPU7JQ) |
+| **Deploy tx** | [`6089c78b…`](https://stellar.expert/explorer/testnet/tx/6089c78bcfe5a16e65b76f5da85ddf31ac00494024f5931904ea5acabc62fcd5) |
+
+Verified live: a `Joint` package (`delivery = 2`) seals, emits `Sealed` carrying
+that mode, and reads back intact. Separately, on throwaway accounts, a joint
+takeover leaves **both** keys at weight 1 against thresholds of 1 — each able to
+act alone, neither locked out.
+
 ## registry + vault — 26 July 2026
 
 The registry gained the three eligibility reads the vault leans on

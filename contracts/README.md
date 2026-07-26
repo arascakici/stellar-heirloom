@@ -149,12 +149,17 @@ event saying so on the record.
 
 | `Delivery` | What lands |
 | --- | --- |
-| `Handover` | `SetOptions` — the heir becomes a signer, the owner's key stands down. Assets never move; control does. Works for any account, whatever it holds. |
+| `Joint` | `SetOptions` — the heir joins as a signer and the owner's key keeps its weight. Both can act alone. Nobody is locked out by a silence they did not intend. |
+| `Handover` | `SetOptions` — the heir becomes a signer and the owner's key stands down. Final: the old key can no longer do anything, which is the point if it might one day be found by somebody else. |
 | `Merge` | `AccountMerge` — every lumen lands in the heir's own wallet and the account ceases to exist. Only possible while the account carries no subentries, and it takes nothing but XLM with it. |
 
-Both are verified against live testnet, including the fact that a single
-trustline is enough to make a merge fail with `op_has_sub_entries`. The interface
-therefore offers `Merge` only to accounts that can actually take it.
+`Joint` and `Handover` differ by a single number — the master weight — and
+nothing else.
+
+All three are verified against live testnet: that a pre-signed merge honours
+`minSeqAge`, that one trustline is enough to make it fail with
+`op_has_sub_entries`, and that after a joint takeover both keys can still act
+alone. The interface offers `Merge` only to accounts that can actually take it.
 
 ### Events
 

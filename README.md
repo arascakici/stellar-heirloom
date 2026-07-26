@@ -32,8 +32,8 @@ courier. The heir does not have to be watching. Nor does anyone else.
 
 | | registry | vault |
 | --- | --- | --- |
-| **Contract** | [`CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU`](https://stellar.expert/explorer/testnet/contract/CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU) | [`CDQIG5JQHNIBVVPO5G5JGHHG7HBDZJ2ZTAIRB3WR2RESYCVPP5G6CMGG`](https://stellar.expert/explorer/testnet/contract/CDQIG5JQHNIBVVPO5G5JGHHG7HBDZJ2ZTAIRB3WR2RESYCVPP5G6CMGG) |
-| **Deploy tx** | [`399e9ae4…`](https://stellar.expert/explorer/testnet/tx/399e9ae4119e16c39859b8505081853b1fcda7d655bf4485cce2877e6c88b684) | [`93dc75f1…`](https://stellar.expert/explorer/testnet/tx/93dc75f10bd0e93c5e00520f8d499cf09ca79ef3c8560642f8be5dfd858faeae) |
+| **Contract** | [`CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU`](https://stellar.expert/explorer/testnet/contract/CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU) | [`CB55KTVZ7QINEKSXDTALKEIEJWW4DHLIGZPM4SANDG3UGF7XKDIPU7JQ`](https://stellar.expert/explorer/testnet/contract/CB55KTVZ7QINEKSXDTALKEIEJWW4DHLIGZPM4SANDG3UGF7XKDIPU7JQ) |
+| **Deploy tx** | [`399e9ae4…`](https://stellar.expert/explorer/testnet/tx/399e9ae4119e16c39859b8505081853b1fcda7d655bf4485cce2877e6c88b684) | [`6089c78b…`](https://stellar.expert/explorer/testnet/tx/6089c78bcfe5a16e65b76f5da85ddf31ac00494024f5931904ea5acabc62fcd5) |
 | **A package collected** | — | [`28e66b92…`](https://stellar.expert/explorer/testnet/tx/28e66b92dff988a1777c8897f9eeb3a7af07f9460faef6a4913e2636fe321c66) |
 
 ### Features
@@ -49,12 +49,19 @@ courier. The heir does not have to be watching. Nor does anyone else.
   `stellar contract info interface` lists the vault's seven functions and none of
   the registry's. The tests wire the two together for real, so the cross-contract
   call is exercised rather than mocked.
-- **Two ways for an account to change hands**, chosen when the plan is sealed.
-  *Handover* makes the heir a signer and stands the owner's key down — assets
-  never move, and it works whatever the account holds. *Merge* sends every lumen
-  into the heir's own wallet and closes the account. Merge is offered only to
-  accounts that can actually take it: one trustline is enough for the network to
-  refuse, so the interface checks before it offers.
+- **Three ways for an account to change hands**, chosen when the plan is sealed.
+  *Joint* adds the heir alongside you and leaves your own key working, so a
+  silence you never meant cannot lock you out of your own account — the default,
+  and the right one when the heir is a spare wallet of your own. *Handover*
+  stands your key down instead, which is what you want if it might one day be
+  found by somebody else. *Merge* sends every lumen into the heir's own wallet
+  and closes the account; it is offered only to accounts that can take it, since
+  one trustline is enough for the network to refuse.
+- **And a way to finish.** A handover gives the heir control, not possession —
+  the balances stay where they were. So the app carries on: it reads what is
+  actually in the account, moves it home, and where nothing is left behind
+  closes the old account so even its locked reserve comes back. A pre-signed
+  transaction could never do this, because it cannot know a future balance.
 - **An heir's side of the app.** Connect a wallet and see the accounts that named
   you — and, among them, the ones that have gone quiet long enough to be yours.
   Which is which is the contract's answer, not a sum the page does. Taking one

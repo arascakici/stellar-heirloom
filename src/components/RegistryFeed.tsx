@@ -126,7 +126,9 @@ function Sentence({ event, mine }: { event: RegistryEvent; mine: boolean }) {
           </span>
           {event.delivery === Delivery.Merge
             ? ", to be merged into their wallet."
-            : ", to hand the account over."}
+            : event.delivery === Delivery.Joint
+              ? ", to join them to the account."
+              : ", to hand the account over."}
         </>
       );
     case "unsealed":

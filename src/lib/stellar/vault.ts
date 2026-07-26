@@ -16,7 +16,7 @@ import type { TxOutcome } from "./outcome";
 /** The deployed vault. Override for a fresh deployment via env. */
 export const VAULT_ID =
   process.env.NEXT_PUBLIC_VAULT_ID ??
-  "CDQIG5JQHNIBVVPO5G5JGHHG7HBDZJ2ZTAIRB3WR2RESYCVPP5G6CMGG";
+  "CB55KTVZ7QINEKSXDTALKEIEJWW4DHLIGZPM4SANDG3UGF7XKDIPU7JQ";
 
 export type SealedEnvelope = {
   owner: string;

@@ -121,6 +121,52 @@ describe("handover delivery", () => {
   });
 });
 
+describe("joint delivery", () => {
+  it("adds the heir without standing the owner's key down", () => {
+    const tx = build({ delivery: Delivery.Joint });
+    const op = tx.operations[0] as Extract<
+      (typeof tx.operations)[number],
+      { type: "setOptions" }
+    >;
+
+    expect(op.type).toBe("setOptions");
+    expect(op.signer).toEqual({ ed25519PublicKey: HEIR, weight: 1 });
+    // The whole difference from a handover, in one number.
+    expect(op.masterWeight).toBe(1);
+  });
+
+  it("differs from a handover in nothing else", () => {
+    const joint = build({ delivery: Delivery.Joint });
+    const handover = build({ delivery: Delivery.Handover });
+
+    const a = joint.operations[0] as Extract<
+      (typeof joint.operations)[number],
+      { type: "setOptions" }
+    >;
+    const b = handover.operations[0] as Extract<
+      (typeof handover.operations)[number],
+      { type: "setOptions" }
+    >;
+
+    expect(a.signer).toEqual(b.signer);
+    expect(a.lowThreshold).toBe(b.lowThreshold);
+    expect(a.medThreshold).toBe(b.medThreshold);
+    expect(a.highThreshold).toBe(b.highThreshold);
+    expect(a.masterWeight).not.toBe(b.masterWeight);
+  });
+
+  it("leaves nobody locked out — both keys can still meet the threshold", () => {
+    const tx = build({ delivery: Delivery.Joint });
+    const op = tx.operations[0] as Extract<
+      (typeof tx.operations)[number],
+      { type: "setOptions" }
+    >;
+
+    expect(op.masterWeight).toBeGreaterThanOrEqual(op.highThreshold!);
+    expect(op.signer!.weight).toBeGreaterThanOrEqual(op.highThreshold!);
+  });
+});
+
 describe("merge delivery", () => {
   it("sends the whole account to the heir's own wallet", () => {
     const tx = build({ delivery: Delivery.Merge });

@@ -22,6 +22,8 @@ export enum Delivery {
   Handover = 0,
   /** Every lumen moves to the heir's own wallet and the account is deleted. */
   Merge = 1,
+  /** The heir joins as a signer; the owner's key keeps working alongside it. */
+  Joint = 2,
 }
 
 /**
@@ -113,11 +115,17 @@ function operationFor(delivery: Delivery, heir: string) {
     return Operation.accountMerge({ destination: heir });
   }
 
-  // Every threshold rises to 1 so the heir's single signature is enough for
-  // anything, and the master weight drops to 0 so the old key is not.
+  // Every threshold sits at 1, so a single signature — from either key that
+  // holds weight — is enough for anything.
+  //
+  // The one difference between the two remaining modes is what happens to the
+  // owner's own key. Standing it down makes the takeover final, which is what
+  // you want if the key might one day be found by someone else. Leaving it be
+  // means a silence you did not intend can never lock you out of your own
+  // account.
   return Operation.setOptions({
     signer: { ed25519PublicKey: heir, weight: 1 },
-    masterWeight: 0,
+    masterWeight: delivery === Delivery.Joint ? 1 : 0,
     lowThreshold: 1,
     medThreshold: 1,
     highThreshold: 1,
