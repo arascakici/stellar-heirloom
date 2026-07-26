@@ -28,6 +28,23 @@ export type SealParams = {
   mode: PlanMode;
   delivery: Delivery;
   onStep?: (step: SealStep) => void;
+  /**
+   * Skip the registry, because a previous attempt already got that far. The
+   * first step is the one that cannot be repeated — an owner may hold only one
+   * active plan — so resuming has to start after it.
+   */
+  alreadyRecorded?: boolean;
+};
+
+export type SealResult = {
+  outcome: TxOutcome;
+  /**
+   * Whether the plan reached the registry. A failure after this point leaves a
+   * plan on the record with no package behind it: it looks healthy and can
+   * never fire, so the interface has to be able to tell the two failures apart
+   * and offer to finish rather than start again.
+   */
+  recorded: boolean;
 };
 
 /**
@@ -49,10 +66,13 @@ export async function sealPlan({
   mode,
   delivery,
   onStep,
-}: SealParams): Promise<TxOutcome> {
-  onStep?.("recording");
-  const recorded = await register(owner, heir, period, mode);
-  if (!recorded.ok) return recorded;
+  alreadyRecorded = false,
+}: SealParams): Promise<SealResult> {
+  if (!alreadyRecorded) {
+    onStep?.("recording");
+    const written = await register(owner, heir, period, mode);
+    if (!written.ok) return { outcome: written, recorded: false };
+  }
 
   onStep?.("signing");
 
@@ -60,8 +80,11 @@ export async function sealPlan({
   const facts = await fetchAccountFacts(owner);
   if (!facts) {
     return {
-      ok: false,
-      reason: { kind: "network", message: "Could not read the account back." },
+      recorded: true,
+      outcome: {
+        ok: false,
+        reason: { kind: "network", message: "Could not read the account back." },
+      },
     };
   }
 
@@ -77,11 +100,16 @@ export async function sealPlan({
     }).toXDR();
   } catch (error) {
     return {
-      ok: false,
-      reason: {
-        kind: "network",
-        message:
-          error instanceof Error ? error.message : "Could not build the takeover.",
+      recorded: true,
+      outcome: {
+        ok: false,
+        reason: {
+          kind: "network",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not build the takeover.",
+        },
       },
     };
   }
@@ -89,17 +117,23 @@ export async function sealPlan({
   const signed = await signXdr(takeoverXdr, owner);
   if (!signed.ok) {
     return {
-      ok: false,
-      reason:
-        signed.error.kind === "rejected"
-          ? { kind: "declined" }
-          : {
-              kind: "network",
-              message: "Your wallet could not sign the takeover.",
-            },
+      recorded: true,
+      outcome: {
+        ok: false,
+        reason:
+          signed.error.kind === "rejected"
+            ? { kind: "declined" }
+            : {
+                kind: "network",
+                message: "Your wallet could not sign the takeover.",
+              },
+      },
     };
   }
 
   onStep?.("storing");
-  return sealEnvelope(owner, heir, delivery, signed.signedXdr);
+  return {
+    recorded: true,
+    outcome: await sealEnvelope(owner, heir, delivery, signed.signedXdr),
+  };
 }

@@ -104,6 +104,8 @@ export function PlanSetup({ owner, onSealed }: Props) {
   const [delivery, setDelivery] = useState<Delivery>(Delivery.Joint);
   const [sealing, setSealing] = useState<SealStep | null>(null);
   const [result, setResult] = useState<TxOutcome | null>(null);
+  /** The registry has the plan; the vault does not have the package. */
+  const [halfSealed, setHalfSealed] = useState(false);
 
   /**
    * What the account carries, once we have heard back. `undefined` while the
@@ -156,20 +158,27 @@ export function PlanSetup({ owner, onSealed }: Props) {
     if (step !== "review" || pending) return;
 
     setResult(null);
-    const outcome = await sealPlan({
+    const { outcome, recorded } = await sealPlan({
       owner,
       heir: trimmedHeir,
       period,
       mode,
       delivery: chosenDelivery,
       onStep: setSealing,
+      alreadyRecorded: halfSealed,
     });
     setSealing(null);
 
     if (outcome.ok) {
+      setHalfSealed(false);
       onSealed({ heir: trimmedHeir, period, mode });
       return;
     }
+
+    // The plan is on the record but the package never reached the vault. Say
+    // so, and resume from there rather than asking for the first signature
+    // again — the registry would refuse it anyway.
+    setHalfSealed(recorded);
     setResult(outcome);
   }
 
@@ -359,7 +368,11 @@ export function PlanSetup({ owner, onSealed }: Props) {
 
         {step === "review" ? (
           <button type="submit" className={styles.submit} disabled={pending}>
-            {sealing ? "Sealing…" : "Seal the plan"}
+            {sealing
+              ? "Sealing…"
+              : halfSealed
+                ? "Finish sealing"
+                : "Seal the plan"}
           </button>
         ) : (
           <button
@@ -381,6 +394,14 @@ export function PlanSetup({ owner, onSealed }: Props) {
       {sealing && (
         <p className={styles.note} role="status">
           {SEALING[sealing]}
+        </p>
+      )}
+
+      {halfSealed && !sealing && (
+        <p className={styles.halfway} role="status">
+          Your plan is on the record, but the signed takeover never reached the
+          vault — so nothing would happen even after the silence. Nothing is
+          lost: the first signature stands, and finishing takes the other two.
         </p>
       )}
 

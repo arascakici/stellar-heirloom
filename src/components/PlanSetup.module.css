@@ -251,6 +251,22 @@
   text-wrap: pretty;
 }
 
+/*
+ * A plan half made: recorded, but with no package behind it. Rust, because
+ * leaving it here would be worse than never having started — it looks like a
+ * plan and would never fire.
+ */
+.halfway {
+  padding: var(--space-3);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--rust-300);
+  background-color: rgb(169 74 45 / 0.1);
+  border: 1px solid rgb(169 74 45 / 0.3);
+  border-radius: var(--radius-sm);
+  text-wrap: pretty;
+}
+
 /* Plain explanation, not a warning — the rust hint above means something else. */
 .note {
   font-size: var(--text-xs);
