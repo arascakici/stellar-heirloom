@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { Feedback } from "@/components/Feedback";
 import { RegistryFeed } from "@/components/RegistryFeed";
 import { RegistryIdentity } from "@/components/RegistryIdentity";
 
@@ -29,6 +30,7 @@ export default function RegistryPage() {
 
         <RegistryIdentity />
         <RegistryFeed />
+        <Feedback />
       </div>
     </main>
   );

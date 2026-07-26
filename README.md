@@ -235,7 +235,7 @@ Open <http://localhost:3000>, connect a wallet, and — if the account is new �
 click **Fund with test XLM** to have the friendbot faucet create it. Then name an
 heir and seal the plan; **I'm here**, in the account menu, winds the clock back.
 
-heirloom runs on testnet with no configuration. Four optional variables repoint it:
+heirloom runs on testnet with no configuration. Seven optional variables repoint it:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
@@ -244,6 +244,25 @@ heirloom runs on testnet with no configuration. Four optional variables repoint 
 | `NEXT_PUBLIC_SOROBAN_RPC_URL` | network default | Override the Soroban RPC endpoint. |
 | `NEXT_PUBLIC_REGISTRY_ID` | the deployed registry | Point at your own deployment of the record. |
 | `NEXT_PUBLIC_VAULT_ID` | the deployed vault | Point at your own deployment of the vault. |
+| `NEXT_PUBLIC_FEEDBACK_URL` | the live form | Point the feedback footer at your own form. |
+| `NEXT_PUBLIC_FEEDBACK_ADDRESS_FIELD` | `entry.1892039617` | That form's own name for its wallet-address question, used to prefill it. |
+
+### Feedback
+
+One line under the plate, on both pages, linking out to a short form: whether
+you got a plan sealed, how useful this is, and what should change.
+
+It asks for your wallet address, and asks for it required, because feedback that
+cannot be placed against a plan on the ledger is just an opinion — this way a
+sentence about the sealing step can be read next to the sealing that person
+actually did. When a wallet is connected the address is prefilled rather than
+retyped; the field stays visible and editable on the other side, so you can see
+what is being sent and clear it if you would rather not say.
+
+That the address travels is a deliberate exception to how the rest of this works,
+and it is worth naming as one. Nothing else here asks you to identify yourself,
+and the count of wallets that have used heirloom does not depend on the form at
+all — it is on chain, where anyone can count it without being shown a dashboard.
 
 ## Testing
 

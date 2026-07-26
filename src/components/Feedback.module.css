@@ -1,0 +1,44 @@
+/*
+ * Below the plate, not on it. A hairline stands in for the edge of the page so
+ * the line reads as a footnote to everything above rather than another control.
+ */
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  max-width: 34rem;
+  /* Centres itself inside the registry's wider column as well as under the plate. */
+  margin-inline: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.line {
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+/*
+ * Parchment rather than brass. Brass is what you press to commit something; an
+ * invitation to complain has no business competing with the seal button.
+ */
+.link {
+  color: var(--text);
+  text-decoration-color: var(--border-strong);
+}
+
+.link:hover {
+  color: var(--accent-bright);
+  text-decoration-color: currentColor;
+}
+
+.aside {
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--text-faint);
+  text-wrap: pretty;
+}

@@ -1,4 +1,5 @@
 import { AccountPanel } from "@/components/AccountPanel";
+import { Feedback } from "@/components/Feedback";
 import { Landing } from "@/components/Landing";
 
 import styles from "./page.module.css";
@@ -10,6 +11,7 @@ export default function Home() {
         <Landing />
         <AccountPanel />
       </div>
+      <Feedback />
     </main>
   );
 }

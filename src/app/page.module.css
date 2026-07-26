@@ -1,8 +1,16 @@
 .page {
   /* The glass bar takes the top; center what remains beneath it. */
   min-height: calc(100dvh - 3.75rem);
-  display: grid;
-  place-items: center;
+  /*
+   * Flex, not grid. Two auto grid rows share the free space between them, which
+   * would lift the plate out of the centre to make room for a footnote; a
+   * centred column keeps the plate where it was and lets the footer follow it.
+   */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
   padding: var(--space-6) var(--space-4);
   /* Light falls from above, the way it would on a lid. */
   background-image: radial-gradient(
