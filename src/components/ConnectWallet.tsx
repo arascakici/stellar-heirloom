@@ -39,8 +39,16 @@ export function ConnectWallet() {
   }
 
   // Say nothing until we know the answer, rather than guessing "disconnected".
+  // But hold the space open: an empty box here and a button a moment later is
+  // the whole top bar changing width, and every page below it moving.
   if (status === "restoring") {
-    return <div className={styles.slot} aria-busy="true" />;
+    return (
+      <div className={styles.slot} aria-busy="true">
+        <span className={`${styles.button} ${styles.ghost}`} aria-hidden="true">
+          Connect wallet
+        </span>
+      </div>
+    );
   }
 
   if (status === "connected") {

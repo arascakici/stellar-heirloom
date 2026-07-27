@@ -337,6 +337,53 @@ plan — the one who sealed it, or the one named to inherit. No address is treat
 differently from any other: this is testnet, where a key costs nothing, and what
 the page is for is what the contracts have actually been put through.
 
+## Performance
+
+Measured before anything was touched, which is the only reason the right thing
+got fixed. The obvious suspect was the bundle — the Stellar SDK is large and
+reaches every route through the wallet providers in the root layout. It turned
+out not to matter: total blocking time was already 0 ms, because every page is
+prerendered static HTML and the first paint never waits for JavaScript.
+Shrinking the SDK would have been a week of careful work for nothing.
+
+What the numbers actually pointed at, on a throttled mobile profile:
+
+| | before | after |
+| --- | --- | --- |
+| Home | 78 | **92** |
+| Registry | 72 | **91** |
+| Usage | 81 | **91** |
+| Largest paint | 3.9–4.5 s | 3.3–3.5 s |
+| Layout shift | 0.158–0.23 | **0** |
+
+Desktop went 97 → 100, with layout shift likewise to zero.
+
+**Fonts, 200 KB down to 92 KB.** Five files were preloaded on every page. Two of
+them existed for `latin-ext` — glyphs no page has ever rendered, since the
+interface is English and everything the chain writes is base32 or hex. A third
+was the monospace face, preloaded ahead of addresses and hashes that do not
+appear until a wallet is connected, competing for bandwidth with the two faces
+actually on screen. The largest paint is a paragraph of body text, and it was
+waiting on all of it.
+
+**Layout shift, 0.158 to zero, and it was in the top bar.** The wallet's slot
+rendered as an empty box on the server — because whether somebody is connected
+is not knowable there — and became a button on hydration, taking the bar from
+54px wide to 199px and pushing every page down four pixels. The fix is the
+button itself, rendered invisible, holding its own footprint open. Standing in
+for a thing with a copy of that thing means the reservation cannot drift out of
+step with it.
+
+**And the record's ruled lines.** The registry's "Reading the record…" was a
+single line that the arriving entries shoved aside — the last shift left, 0.072
+of it. It now waits as six ruled lines in the shape of entries, which reserves
+the right space and reads better than a sentence about waiting.
+
+One trade-off left deliberately: fonts still use `display: swap` rather than
+`optional`. On a slow first visit that costs about a second of largest paint,
+and `optional` would buy it back by never swapping the face in at all. The
+typography is not decoration here, so the second is the cheaper thing to spend.
+
 ## Monitoring
 
 Nothing is shipped to anybody. An error tracker is where a privacy claim

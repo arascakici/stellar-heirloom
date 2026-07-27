@@ -150,3 +150,42 @@
     animation: none;
   }
 }
+
+/*
+ * A line waiting to be written on. It borrows the entry's own box, so the space
+ * it holds is exactly the space an entry will take — the point of it.
+ */
+.waiting {
+  animation: none;
+}
+
+.waiting .mark {
+  opacity: 0.35;
+}
+
+.rule {
+  height: 0.5em;
+  border-radius: 1px;
+  background-color: var(--border);
+  opacity: 0.5;
+  animation: breathe 1.8s ease-in-out infinite;
+}
+
+/* Every line a different length, or it reads as a table rather than a book. */
+.waiting:nth-child(2n) .rule {
+  margin-right: 22%;
+}
+
+.waiting:nth-child(3n) .rule {
+  margin-right: 38%;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}

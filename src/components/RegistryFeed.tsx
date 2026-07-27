@@ -13,6 +13,13 @@ import { useWallet } from "@/lib/wallet/WalletProvider";
 import styles from "./RegistryFeed.module.css";
 
 /**
+ * Lines held open while the record is read. Six rather than the twelve the feed
+ * keeps: enough that the arriving entries have somewhere to land, not so many
+ * that a quiet week leaves a page of ruled emptiness.
+ */
+const WAITING_LINES = 6;
+
+/**
  * What the registry has witnessed, as it happens.
  *
  * The contract is a notary: it never holds anything, it only writes down what
@@ -38,7 +45,22 @@ export function RegistryFeed() {
       {error ? (
         <p className={styles.status}>{error}</p>
       ) : loading ? (
-        <p className={styles.status}>Reading the record…</p>
+        /*
+         * Ruled lines rather than a sentence. "Reading the record…" was one
+         * short paragraph that the arriving list then shoved out of the way,
+         * and it was measurably the last layout shift left on this page —
+         * 0.072 of it. Holding the book's own lines open costs nothing, says
+         * the same thing, and means the entries fill a space that was already
+         * theirs.
+         */
+        <ol className={styles.list} aria-hidden="true">
+          {Array.from({ length: WAITING_LINES }, (_, line) => (
+            <li className={`${styles.entry} ${styles.waiting}`} key={line}>
+              <span className={styles.mark} />
+              <span className={styles.rule} />
+            </li>
+          ))}
+        </ol>
       ) : events.length === 0 ? (
         <p className={styles.status}>
           Nothing in the last few hours. Seal a plan and it will be written here.

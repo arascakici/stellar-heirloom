@@ -1,7 +1,24 @@
 .slot {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   min-height: 2.25rem;
+}
+
+/*
+ * The wallet's footprint, held open while we work out whether anybody is
+ * connected.
+ *
+ * Measured: without this the bar rendered as two links and an empty box, then
+ * grew from 54px wide to 199px the moment hydration produced a button —
+ * pushing every page down by four pixels and accounting for a 0.158 layout
+ * shift on all of them, the single largest one in the app. The reservation is
+ * the button itself, rendered invisible, so it can never drift out of step with
+ * the thing it is standing in for.
+ */
+.ghost {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* Compact brass, for the bar. */
