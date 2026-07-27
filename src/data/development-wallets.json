@@ -1,0 +1,65 @@
+{
+  "note": "Wallets that belong to building heirloom, not to using it. Kept apart so the usage page can say plainly how many of the addresses on chain are somebody's and how many are ours. Add an address here when it is a test key; anything not listed counts as a real visitor.",
+  "wallets": [
+    {
+      "address": "GAGGM6ZCI3BFXR36NNYBRSUZVSLZKCU5SO4KBOU2DCIPK6NS4URI2GY2",
+      "why": "throwaway keypair from a testnet verification run"
+    },
+    {
+      "address": "GAIUZOWASEYNJQYDGMW3VHS4GKY5UWONRL4TVBXHWOTJEVHK3WIXDTQ3",
+      "why": "probe: heir for the watchtower delivery run"
+    },
+    {
+      "address": "GAVIEXQVAONE6UV72D7XLDBRLVZCVS7HRCEGJOK3N27JA52W7X3DFZST",
+      "why": "throwaway keypair from a testnet verification run"
+    },
+    {
+      "address": "GBBHPJYHGFN5UEFQCSQBS6J5FAL2UG4RAKJY545ESHSGBKMIKMFCIDTL",
+      "why": "maintainer's own test wallet (halka-funded)"
+    },
+    {
+      "address": "GBBNZO4ZJ3UVOEIEIXNIZIEWRQ6PWSDBYTIHFHRAQ7ALYRKTELEZJZ62",
+      "why": "throwaway keypair from a testnet verification run"
+    },
+    {
+      "address": "GBK5HDSALNEMVQVNPFBQPHVPIIWVGOSKESN3T47ILEQJKIPHV2A6JPUB",
+      "why": "probe: second owner for the same index check"
+    },
+    {
+      "address": "GBOXM2HZAWS3EPBTHSVRGLH7PEB7CO5IWGQZBEAPLI3BNIQPYEC2SJCQ",
+      "why": "throwaway keypair from a testnet verification run"
+    },
+    {
+      "address": "GBQRAWAAWGSS2G5G4BWAN3XJBGGEXYDJM66S7Z6TPULGLEDC7RE2O4PW",
+      "why": "maintainer's second test wallet, used as the heir in manual runs"
+    },
+    {
+      "address": "GC7FOEPTY23LADTEG7TUFVFUHHUQXLISVDQAAN6LQUKD6SIQS4DTZ7P6",
+      "why": "probe: heir for the index check"
+    },
+    {
+      "address": "GCTNEW4HIIWPBHHIQ7NAWBEK4TVMJ74RKLXYGEPMOI4NWPBVB64WAEX3",
+      "why": "probe: end-to-end watchtower delivery, Joint takeover"
+    },
+    {
+      "address": "GCWJ23TSVQRH3US5DO4SDLAIFK6CHJS5NTEN35QGFYZRKNLCZKIGN4UJ",
+      "why": "contract deployer key (heirloom-deployer)"
+    },
+    {
+      "address": "GCZ4O2XFSS7NJ6TG4ZGK3TXIR2P6CVL3DCRGN5BG7UTKLH6OI6WMR5QO",
+      "why": "throwaway keypair from a testnet verification run"
+    },
+    {
+      "address": "GCZ7HSGQWW3OW5HVEM4JWX5MMRRPYNZ2DFMLMF5NBD7PPPDRJRZYI7US",
+      "why": "probe: proving the vault's owners() index adds and removes"
+    },
+    {
+      "address": "GDEWDZLL55ELHGKQ3OTOM2TTJE4L7XYYDLC3ZZXYF22UMG57W5DENOEB",
+      "why": "deployer's paired heir key (heirloom-heir)"
+    },
+    {
+      "address": "GDGCKUB2EPWEJA3WZVBGTLCMK3RM3FZT6FRNLCFZXVPDOGCCNYUXTF3T",
+      "why": "throwaway keypair from a testnet verification run"
+    }
+  ]
+}

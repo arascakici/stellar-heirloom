@@ -11,7 +11,9 @@ import styles from "./TopBar.module.css";
  * identity you can see and step away from at any moment — rather than in the
  * middle of the page. The wood grain reads faintly through it.
  *
- * The mark is the way home; beside it, the way to the registry's own record.
+ * The mark is the way home; beside it, the record itself and the count drawn
+ * from it. Usage gives way first on a narrow screen — it is the page you go
+ * looking for, never the one you need mid-task.
  */
 export function TopBar() {
   const path = usePathname();
@@ -23,6 +25,13 @@ export function TopBar() {
           heirloom
         </Link>
         <nav className={styles.right}>
+          <Link
+            href="/usage"
+            className={`${styles.link} ${styles.secondary}`}
+            aria-current={path === "/usage" ? "page" : undefined}
+          >
+            Usage
+          </Link>
           <Link
             href="/registry"
             className={styles.link}

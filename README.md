@@ -294,7 +294,7 @@ npm test          # once
 npm run test:watch
 ```
 
-Thirty-seven checks. The event tests rebuild genuine `ScVal`s rather than
+Seventy-three checks. The event tests rebuild genuine `ScVal`s rather than
 mocking the decoder's input, so a change in how the contract publishes would
 fail them rather than slip past.
 
@@ -309,6 +309,37 @@ takeover is refused while an account is active and accepted only once it has gon
 idle — for both the standing (survives activity) and sealed (one-shot) plan
 modes. Ten checks, all passing. It becomes the CI suite at a later belt.
 
+## Usage
+
+[`/usage`](https://stellar-heirloom.vercel.app/usage) counts what the two
+contracts have witnessed. There is no tracker on this site and no analytics
+account behind it: measuring visitors by handing their wallet addresses to a
+third party would contradict the only thing heirloom claims. The figures come
+from the same public events the registry reads out one by one, and every id
+behind them can be looked up on chain — a number you cannot go and check is
+worth nothing, whoever is showing it to you.
+
+Two sources answer two different questions. Soroban RPC keeps events for about
+seven days, which is fine for a live feed and useless for a count, so the record
+over all time lives in `src/data/usage.json`, in git, where every addition is
+dated and anybody can verify it against the chain. The page renders that
+immediately and then folds in whatever has happened since.
+
+```bash
+npm run usage:snapshot
+```
+
+Merges anything new into the record. It only ever grows, dedupes by the event's
+RPC id, and is safe to run twice.
+
+Wallets that belong to *building* heirloom rather than to using it are listed in
+`src/data/development-wallets.json` — the deployer, the maintainer's test
+wallets, and every throwaway keypair a verification run has left behind — and
+they are subtracted from the headline figure. The list errs against us: an
+address is presumed ours until it is shown not to be, so the visitor count
+starts at zero and can only be earned. Reporting fifteen users on the day the
+record was opened would have been the easiest lie available.
+
 ## Continuous integration
 
 Every push and pull request runs
@@ -316,7 +347,7 @@ Every push and pull request runs
 
 | Job | What it checks |
 | --- | --- |
-| **Registry contract** | `cargo fmt --check`, `cargo clippy -D warnings`, the 14 unit tests, and a build for `wasm32v1-none` — the target the contract actually ships to, so a wasm-only failure can't reach a deploy. The wasm is kept as a build artifact. |
+| **Registry contract** | `cargo fmt --check`, `cargo clippy -D warnings`, the 39 unit tests, and a build for `wasm32v1-none` — the target the contract actually ships to, so a wasm-only failure can't reach a deploy. The wasm is kept as a build artifact. |
 | **Web app** | `npm ci`, `npm run lint`, `npm test`, `npm run build` on Node 22 — the floor the Stellar SDK actually requires, rather than the version we happen to develop on. |
 
 A third workflow,

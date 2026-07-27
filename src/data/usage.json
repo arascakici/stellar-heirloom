@@ -1,0 +1,192 @@
+{
+  "note": "Written by scripts/usage-snapshot.mjs. Every id here can be looked up on chain.",
+  "network": "Test SDF Network ; September 2015",
+  "contracts": {
+    "registry": "CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU",
+    "vault": "CANLQE764X2GHPCFHHDIBXPT35PATT2IIYRCFBK77O6EECKS3CPJDHPY"
+  },
+  "events": [
+    {
+      "id": "0016380266532618240-0000000000",
+      "kind": "registered",
+      "owner": "GCWJ23TSVQRH3US5DO4SDLAIFK6CHJS5NTEN35QGFYZRKNLCZKIGN4UJ",
+      "ledger": 3813828,
+      "at": "2026-07-26T17:39:28Z",
+      "txHash": "cf760f0f1dffe99da8f514659fb16c5d3b42615aa01dcfca98d612086c3b5199",
+      "heir": "GDEWDZLL55ELHGKQ3OTOM2TTJE4L7XYYDLC3ZZXYF22UMG57W5DENOEB",
+      "period": 60,
+      "mode": 0
+    },
+    {
+      "id": "0016380756158865408-0000000000",
+      "kind": "registered",
+      "owner": "GAVIEXQVAONE6UV72D7XLDBRLVZCVS7HRCEGJOK3N27JA52W7X3DFZST",
+      "ledger": 3813942,
+      "at": "2026-07-26T17:48:59Z",
+      "txHash": "ae162611b7ddcb01345b2f4aa5fafe58a631a8d627e32e5e7686fd05c1fc7e6b",
+      "heir": "GDGCKUB2EPWEJA3WZVBGTLCMK3RM3FZT6FRNLCFZXVPDOGCCNYUXTF3T",
+      "period": 60,
+      "mode": 1
+    },
+    {
+      "id": "0016388950956494848-0000000000",
+      "kind": "registered",
+      "owner": "GBBHPJYHGFN5UEFQCSQBS6J5FAL2UG4RAKJY545ESHSGBKMIKMFCIDTL",
+      "ledger": 3815850,
+      "at": "2026-07-26T20:28:17Z",
+      "txHash": "e48b0ba75e08fe8c8a5fce9dcde0650f8d116b152c21c1755181fd0084b2a31c",
+      "heir": "GBQRAWAAWGSS2G5G4BWAN3XJBGGEXYDJM66S7Z6TPULGLEDC7RE2O4PW",
+      "period": 120,
+      "mode": 0
+    },
+    {
+      "id": "0016389930209021952-0000000000",
+      "kind": "registered",
+      "owner": "GBQRAWAAWGSS2G5G4BWAN3XJBGGEXYDJM66S7Z6TPULGLEDC7RE2O4PW",
+      "ledger": 3816078,
+      "at": "2026-07-26T20:47:20Z",
+      "txHash": "893af3cedc9a3af78e9f47e1587eeda7f84121e449189aedff3c2e0077a0cb2b",
+      "heir": "GBBHPJYHGFN5UEFQCSQBS6J5FAL2UG4RAKJY545ESHSGBKMIKMFCIDTL",
+      "period": 120,
+      "mode": 0
+    },
+    {
+      "id": "0016390179317100544-0000000000",
+      "kind": "registered",
+      "owner": "GCZ4O2XFSS7NJ6TG4ZGK3TXIR2P6CVL3DCRGN5BG7UTKLH6OI6WMR5QO",
+      "ledger": 3816136,
+      "at": "2026-07-26T20:52:10Z",
+      "txHash": "416ef4e405a24d14dc6c2250daa9dea593f992b61f5d652acae414024a0d9385",
+      "heir": "GBOXM2HZAWS3EPBTHSVRGLH7PEB7CO5IWGQZBEAPLI3BNIQPYEC2SJCQ",
+      "period": 60,
+      "mode": 0
+    },
+    {
+      "id": "0016390235151667200-0000000000",
+      "kind": "registered",
+      "owner": "GAGGM6ZCI3BFXR36NNYBRSUZVSLZKCU5SO4KBOU2DCIPK6NS4URI2GY2",
+      "ledger": 3816149,
+      "at": "2026-07-26T20:53:15Z",
+      "txHash": "2447687265c775e0ac95cccdd2a18c139652beb0ad9e0dd0cc198b240cda0d60",
+      "heir": "GBBNZO4ZJ3UVOEIEIXNIZIEWRQ6PWSDBYTIHFHRAQ7ALYRKTELEZJZ62",
+      "period": 60,
+      "mode": 0
+    },
+    {
+      "id": "0016390243741618176-0000000000",
+      "kind": "heartbeat",
+      "owner": "GAGGM6ZCI3BFXR36NNYBRSUZVSLZKCU5SO4KBOU2DCIPK6NS4URI2GY2",
+      "ledger": 3816151,
+      "at": "2026-07-26T20:53:25Z",
+      "txHash": "b86b7f600665bf82e72756bc766624d9dffa75976d161a2cafb8d2249dd9a4b8"
+    },
+    {
+      "id": "0016390248036597760-0000000000",
+      "kind": "cancelled",
+      "owner": "GAGGM6ZCI3BFXR36NNYBRSUZVSLZKCU5SO4KBOU2DCIPK6NS4URI2GY2",
+      "ledger": 3816152,
+      "at": "2026-07-26T20:53:30Z",
+      "txHash": "1ce9d5c4e49e9a0818f1842b35dab35364e9739e444c349871be2d00568b3f43",
+      "heir": "GBBNZO4ZJ3UVOEIEIXNIZIEWRQ6PWSDBYTIHFHRAQ7ALYRKTELEZJZ62"
+    },
+    {
+      "id": "0016390810677325824-0000000000",
+      "kind": "cancelled",
+      "owner": "GBQRAWAAWGSS2G5G4BWAN3XJBGGEXYDJM66S7Z6TPULGLEDC7RE2O4PW",
+      "ledger": 3816283,
+      "at": "2026-07-26T21:04:27Z",
+      "txHash": "4d63c8dbd3050f2618343a6c27f069339d7612e7865b078850db493823b4fc31",
+      "heir": "GBBHPJYHGFN5UEFQCSQBS6J5FAL2UG4RAKJY545ESHSGBKMIKMFCIDTL"
+    },
+    {
+      "id": "0016391008245784576-0000000000",
+      "kind": "cancelled",
+      "owner": "GBBHPJYHGFN5UEFQCSQBS6J5FAL2UG4RAKJY545ESHSGBKMIKMFCIDTL",
+      "ledger": 3816329,
+      "at": "2026-07-26T21:08:17Z",
+      "txHash": "11638c671675114695289ffcfb62be1de66049f8264c6aa125b6e60aac0923de",
+      "heir": "GBQRAWAAWGSS2G5G4BWAN3XJBGGEXYDJM66S7Z6TPULGLEDC7RE2O4PW"
+    },
+    {
+      "id": "0016448032526610432-0000000000",
+      "kind": "registered",
+      "owner": "GCZ7HSGQWW3OW5HVEM4JWX5MMRRPYNZ2DFMLMF5NBD7PPPDRJRZYI7US",
+      "ledger": 3829606,
+      "at": "2026-07-27T15:36:56Z",
+      "txHash": "94c5c13769901a0dbe01be10f5a26c3587d25ef8bf10e4d84ff4db805ddeb067",
+      "heir": "GC7FOEPTY23LADTEG7TUFVFUHHUQXLISVDQAAN6LQUKD6SIQS4DTZ7P6",
+      "period": 60,
+      "mode": 0
+    },
+    {
+      "id": "0016448036821553152-0000000000",
+      "kind": "sealed",
+      "owner": "GCZ7HSGQWW3OW5HVEM4JWX5MMRRPYNZ2DFMLMF5NBD7PPPDRJRZYI7US",
+      "ledger": 3829607,
+      "at": "2026-07-27T15:37:01Z",
+      "txHash": "f2dcf7abe57567546ac1cc7b3734c2243a6b0ba68663547873479d8c17d7130f",
+      "heir": "GC7FOEPTY23LADTEG7TUFVFUHHUQXLISVDQAAN6LQUKD6SIQS4DTZ7P6",
+      "delivery": 2
+    },
+    {
+      "id": "0016448062591373312-0000000000",
+      "kind": "registered",
+      "owner": "GBK5HDSALNEMVQVNPFBQPHVPIIWVGOSKESN3T47ILEQJKIPHV2A6JPUB",
+      "ledger": 3829613,
+      "at": "2026-07-27T15:37:31Z",
+      "txHash": "d46a0c7d581c1386eb010d0777a14152117951b3515fe715d03227785f3f3e22",
+      "heir": "GC7FOEPTY23LADTEG7TUFVFUHHUQXLISVDQAAN6LQUKD6SIQS4DTZ7P6",
+      "period": 60,
+      "mode": 0
+    },
+    {
+      "id": "0016448066886324224-0000000000",
+      "kind": "sealed",
+      "owner": "GBK5HDSALNEMVQVNPFBQPHVPIIWVGOSKESN3T47ILEQJKIPHV2A6JPUB",
+      "ledger": 3829614,
+      "at": "2026-07-27T15:37:37Z",
+      "txHash": "ba14df2a69dc3e4483ff234eba08c9952ad5bc0db0c5d6fc009af2457ed9fe41",
+      "heir": "GC7FOEPTY23LADTEG7TUFVFUHHUQXLISVDQAAN6LQUKD6SIQS4DTZ7P6",
+      "delivery": 0
+    },
+    {
+      "id": "0016448071181312000-0000000000",
+      "kind": "unsealed",
+      "owner": "GCZ7HSGQWW3OW5HVEM4JWX5MMRRPYNZ2DFMLMF5NBD7PPPDRJRZYI7US",
+      "ledger": 3829615,
+      "at": "2026-07-27T15:37:42Z",
+      "txHash": "ffa46d9820f59a7007988f717c6d049e92db2b2dbf2f382aa592471d61f31f2a",
+      "heir": "GC7FOEPTY23LADTEG7TUFVFUHHUQXLISVDQAAN6LQUKD6SIQS4DTZ7P6"
+    },
+    {
+      "id": "0016448247274946560-0000000000",
+      "kind": "registered",
+      "owner": "GCTNEW4HIIWPBHHIQ7NAWBEK4TVMJ74RKLXYGEPMOI4NWPBVB64WAEX3",
+      "ledger": 3829656,
+      "at": "2026-07-27T15:41:07Z",
+      "txHash": "a40f022dd3b109090f0d5d4c058b2fe2c8c4ac04b6c4d8fff2d82e8b6cd58c63",
+      "heir": "GAIUZOWASEYNJQYDGMW3VHS4GKY5UWONRL4TVBXHWOTJEVHK3WIXDTQ3",
+      "period": 60,
+      "mode": 0
+    },
+    {
+      "id": "0016448251569934336-0000000000",
+      "kind": "sealed",
+      "owner": "GCTNEW4HIIWPBHHIQ7NAWBEK4TVMJ74RKLXYGEPMOI4NWPBVB64WAEX3",
+      "ledger": 3829657,
+      "at": "2026-07-27T15:41:12Z",
+      "txHash": "bd1a64bbd0d21294f6ddcf43f3e09a2ad1836465649cd3cd80571f834457ab7d",
+      "heir": "GAIUZOWASEYNJQYDGMW3VHS4GKY5UWONRL4TVBXHWOTJEVHK3WIXDTQ3",
+      "delivery": 2
+    },
+    {
+      "id": "0016448376123981824-0000000000",
+      "kind": "unsealed",
+      "owner": "GBK5HDSALNEMVQVNPFBQPHVPIIWVGOSKESN3T47ILEQJKIPHV2A6JPUB",
+      "ledger": 3829686,
+      "at": "2026-07-27T15:43:37Z",
+      "txHash": "b8174673c0a4e7b2e14f3732c5638d6ed8cddcac6af72beff4c209df335efe9b",
+      "heir": "GC7FOEPTY23LADTEG7TUFVFUHHUQXLISVDQAAN6LQUKD6SIQS4DTZ7P6"
+    }
+  ]
+}

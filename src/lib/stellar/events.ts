@@ -155,6 +155,47 @@ export async function fetchRegistryEvents(
   };
 }
 
+/**
+ * Everything RPC still holds, from the oldest ledger it kept up to now.
+ *
+ * The stop condition is the interesting part. A page that comes back empty is
+ * *not* the end: the server scans a bounded stretch of ledgers per request and
+ * hands back a cursor for where it stopped, so across a sparse week most pages
+ * are empty and stopping at the first would cover a fraction of the window.
+ * What does mean the end is the cursor ceasing to move — that is how RPC says it
+ * has reached the present. Measured against testnet: fourteen requests to cross
+ * seven days, where stopping early crossed about a third of it.
+ */
+export async function fetchAllRegistryEvents(): Promise<RegistryEvent[]> {
+  const filters = [
+    { type: "contract" as const, contractIds: [REGISTRY_ID, VAULT_ID] },
+  ];
+
+  const oldest = (await soroban.getHealth()).oldestLedger;
+  let request: Parameters<typeof soroban.getEvents>[0] = {
+    startLedger: oldest,
+    filters,
+    limit: 200,
+  };
+  let previous: string | null = null;
+  const found: RegistryEvent[] = [];
+
+  // A ceiling, so a cursor that somehow never settles cannot spin forever.
+  for (let page = 0; page < 60; page += 1) {
+    const response = await soroban.getEvents(request);
+    for (const raw of response.events) {
+      const event = toRegistryEvent(raw);
+      if (event) found.push(event);
+    }
+
+    if (!response.cursor || response.cursor === previous) break;
+    previous = response.cursor;
+    request = { cursor: response.cursor, filters, limit: 200 };
+  }
+
+  return found;
+}
+
 /** True when this event concerns the given account, either side of the plan. */
 export function concerns(event: RegistryEvent, address: string): boolean {
   return event.owner === address || event.heir === address;

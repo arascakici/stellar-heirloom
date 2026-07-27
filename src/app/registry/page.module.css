@@ -51,3 +51,11 @@
     font-size: var(--text-sm);
   }
 }
+
+/* A pointer onward, quieter than the record it sits under. */
+.aside {
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--text-faint);
+  text-wrap: pretty;
+}

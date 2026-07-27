@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { Feedback } from "@/components/Feedback";
 import { RegistryFeed } from "@/components/RegistryFeed";
@@ -30,6 +31,10 @@ export default function RegistryPage() {
 
         <RegistryIdentity />
         <RegistryFeed />
+        <p className={styles.aside}>
+          The same events, counted rather than read one by one, are on the{" "}
+          <Link href="/usage">usage page</Link>.
+        </p>
         <Feedback />
       </div>
     </main>

@@ -72,8 +72,8 @@
   }
 }
 
-/* Three things share the bar now; on a small phone they give ground. */
-@media (max-width: 26rem) {
+/* Four things share the bar now; on a small phone they give ground. */
+@media (max-width: 30rem) {
   .inner {
     gap: var(--space-3);
   }
@@ -88,5 +88,14 @@
 
   .link {
     font-size: var(--text-xs);
+  }
+
+  /*
+   * Usage goes rather than being crushed. It is a page you go looking for, so
+   * losing it from the bar costs a visitor nothing mid-task — where a squeezed
+   * wallet button would cost them the thing they came to do.
+   */
+  .secondary {
+    display: none;
   }
 }
