@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { report } from "../incident";
 import { fetchXlmBalance, type AccountBalance } from "./balance";
 
 type Snapshot = {
@@ -34,7 +35,8 @@ export function useBalance(address: string | null): BalanceState {
 
     try {
       return { address, balance: await fetchXlmBalance(address), error: null };
-    } catch {
+    } catch (error) {
+      report(error, "read:balance");
       return {
         address,
         balance: null,

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { report } from "../incident";
 import { getPlan, plansForHeir, type Plan } from "./registry";
 
 type Snapshot = {
@@ -43,7 +44,8 @@ export function usePlans(address: string | null): PlansState {
         plansForHeir(address),
       ]);
       return { address, plan, heirPlans, error: null };
-    } catch {
+    } catch (error) {
+      report(error, "read:plans");
       return {
         address,
         plan: null,

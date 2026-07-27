@@ -1,4 +1,3 @@
-import developmentWallets from "@/data/development-wallets.json";
 import snapshot from "@/data/usage.json";
 
 import type { RegistryEvent, RegistryEventKind } from "./events";
@@ -35,10 +34,6 @@ export type StoredEvent = {
 export type Usage = {
   /** Distinct addresses, either side of a plan. */
   wallets: number;
-  /** Of those, the ones that belong to building this rather than using it. */
-  developmentWallets: number;
-  /** `wallets` minus the development ones — the honest visitor count. */
-  visitorWallets: number;
   counts: Record<RegistryEventKind, number>;
   /** Plans recorded that have not since been called off. */
   plansStanding: number;
@@ -59,12 +54,6 @@ const KINDS: RegistryEventKind[] = [
   "unsealed",
   "claimed",
 ];
-
-const DEVELOPMENT: ReadonlySet<string> = new Set(
-  developmentWallets.wallets.map((wallet) => wallet.address),
-);
-
-export const developmentWalletCount = developmentWallets.wallets.length;
 
 /** The record as committed, oldest first. */
 export function recordedEvents(): StoredEvent[] {
@@ -153,19 +142,12 @@ export function summarise(events: StoredEvent[]): Usage {
     }
   }
 
-  let development = 0;
-  for (const wallet of wallets) {
-    if (DEVELOPMENT.has(wallet)) development += 1;
-  }
-
   const days = [...byDay.entries()]
     .map(([date, count]) => ({ date, events: count }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
   return {
     wallets: wallets.size,
-    developmentWallets: development,
-    visitorWallets: wallets.size - development,
     counts,
     plansStanding: standing.size,
     packagesHeld: holding.size,

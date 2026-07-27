@@ -6,6 +6,7 @@ import { formatDuration, humanizeApprox } from "@/lib/stellar/duration";
 import { Delivery } from "@/lib/stellar/envelope";
 import { shortenAddress } from "@/lib/stellar/network";
 import { PlanMode, type Plan } from "@/lib/stellar/registry";
+import { report } from "@/lib/incident";
 import { getEnvelope, type SealedEnvelope } from "@/lib/stellar/vault";
 import { useNowSeconds } from "@/lib/useNow";
 
@@ -42,7 +43,11 @@ export function PlanCard({ plan }: { plan: Plan }) {
       .then((found) => {
         if (!cancelled) setEnvelope(found);
       })
-      .catch(() => {
+      .catch((error) => {
+        // Shown as "none sealed", which is also what a *real* absence looks
+        // like — so without this the one state worth interrupting for and a
+        // failed read are indistinguishable, on the page and in the logs.
+        report(error, "read:envelope");
         if (!cancelled) setEnvelope(null);
       });
     return () => {

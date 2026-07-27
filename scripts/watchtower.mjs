@@ -44,7 +44,20 @@ const VAULT =
 const horizon = new Horizon.Server(HORIZON)
 const soroban = new rpc.Server(RPC)
 
-const summary = { seen: 0, due: 0, delivered: 0, failed: 0, recorded: 0 }
+const summary = { seen: 0, due: 0, delivered: 0, refused: 0, failed: 0, recorded: 0 }
+
+/**
+ * Whether the network turning a takeover away is the mechanism working.
+ *
+ * These two mean the account moved between our reading the registry and the
+ * network seeing the transaction — a sign of life arriving late, which is
+ * exactly what a dead man's switch is supposed to respect. Anything else means
+ * a package that was due did not go out, and somebody should be told.
+ */
+function expected(codes) {
+  const code = codes?.transaction
+  return code === 'tx_bad_minseq_age_or_gap' || code === 'tx_bad_seq'
+}
 const lines = []
 
 function say(line) {
@@ -115,9 +128,14 @@ async function deliver(owner) {
     summary.delivered += 1
     say(`delivered  ${owner}  ${result.hash}`)
   } catch (error) {
-    summary.failed += 1
     const codes = error?.response?.data?.extras?.result_codes
-    say(`refused    ${owner}  ${JSON.stringify(codes ?? error.message)}`)
+    if (expected(codes)) {
+      summary.refused += 1
+      say(`refused    ${owner}  ${JSON.stringify(codes)}`)
+    } else {
+      summary.failed += 1
+      say(`FAILED     ${owner}  ${JSON.stringify(codes ?? error.message)}`)
+    }
     return
   }
 
@@ -172,7 +190,7 @@ async function main() {
 
   say(
     `\n${summary.seen} waiting · ${summary.due} due · ${summary.delivered} delivered · ` +
-      `${summary.failed} failed · ${summary.recorded} receipts`,
+      `${summary.refused} refused · ${summary.failed} failed · ${summary.recorded} receipts`,
   )
 
   // Leave a trace in the job summary when running in Actions.
@@ -184,9 +202,16 @@ async function main() {
     )
   }
 
-  // A refusal is news, not a failure: an owner may simply have moved in the
-  // meantime, which is the mechanism working.
-  process.exit(0)
+  /*
+   * A refusal is news, not a failure: an owner may simply have moved in the
+   * meantime, which is the mechanism working. A *failure* is different — a
+   * package that was due and did not go out — and it has to turn the job red.
+   *
+   * This used to exit zero whatever happened, which meant the one job in the
+   * project whose silence is indistinguishable from success could never say
+   * otherwise. An hourly green tick is worth nothing if it is unconditional.
+   */
+  process.exit(summary.failed > 0 ? 1 : 0)
 }
 
 main().catch((error) => {

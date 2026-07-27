@@ -83,7 +83,7 @@ courier. The heir does not have to be watching. Nor does anyone else.
   signature, so it cannot act early and cannot be trusted wrongly — and if it
   stops running, an heir loses nothing but the convenience.
 - **CI on every push** — formatting, clippy, 39 contract tests, a `wasm32v1-none`
-  build, then lint, 60 frontend tests and a production build. Deployment is a
+  build, then lint, 88 frontend tests and a production build. Deployment is a
   separate workflow that runs only by hand, only after a typed confirmation, and
   installs a checksum-pinned toolchain before it is shown a key.
 - **Three signatures, said out loud.** Sealing records the plan, signs the
@@ -294,7 +294,7 @@ npm test          # once
 npm run test:watch
 ```
 
-Seventy-three checks. The event tests rebuild genuine `ScVal`s rather than
+Eighty-eight checks. The event tests rebuild genuine `ScVal`s rather than
 mocking the decoder's input, so a change in how the contract publishes would
 fail them rather than slip past.
 
@@ -332,13 +332,47 @@ npm run usage:snapshot
 Merges anything new into the record. It only ever grows, dedupes by the event's
 RPC id, and is safe to run twice.
 
-Wallets that belong to *building* heirloom rather than to using it are listed in
-`src/data/development-wallets.json` — the deployer, the maintainer's test
-wallets, and every throwaway keypair a verification run has left behind — and
-they are subtracted from the headline figure. The list errs against us: an
-address is presumed ours until it is shown not to be, so the visitor count
-starts at zero and can only be earned. Reporting fifteen users on the day the
-record was opened would have been the easiest lie available.
+The headline figure is distinct addresses that have appeared on either side of a
+plan — the one who sealed it, or the one named to inherit. No address is treated
+differently from any other: this is testnet, where a key costs nothing, and what
+the page is for is what the contracts have actually been put through.
+
+## Monitoring
+
+Nothing is shipped to anybody. An error tracker is where a privacy claim
+usually dies quietly — the default install sends breadcrumbs, URLs, form values
+and session replays to a third party, and a wallet address in a stack trace is
+still a wallet address. So heirloom writes its failures to the deployment's own
+standard error, which the host already collects, and strips them first.
+
+Stripping happens twice: once where the error is caught, once again on the
+server that records it. That is not caution for its own sake — `POST
+/api/incident` is reachable by anyone who can send a POST, so nothing arriving
+there can be assumed to have been through the first pass. Account ids, contract
+ids, transaction hashes, base64 envelopes and email addresses are replaced.
+A secret seed gets its own unmistakable placeholder rather than being quietly
+called "an address", because if one ever reaches a log that is a bug worth
+being unable to read past.
+
+What survives is what fixes things: where it happened, what kind of error, the
+shape of the message, four stack frames, and Next.js's digest. What does not is
+who it happened to. Fifteen tests hold that line, asserted against real
+generated keys rather than strings that look like them — a leak is the one
+failure mode that works perfectly while it happens.
+
+Server-side errors go through `src/instrumentation.ts` (`onRequestError`), which
+is the only place a failure inside a route handler or a server render is visible
+at all. `src/app/error.tsx` and `src/app/global-error.tsx` catch the browser's,
+and both lead with the thing that actually matters to somebody staring at a
+crash in an app about inheritance: nothing has happened to their account, because
+heirloom holds nothing and can move nothing.
+
+The watchtower reports too, by failing. It used to exit zero whatever happened,
+which meant the one job whose silence is indistinguishable from success could
+never say otherwise — an hourly green tick is worth nothing if it is
+unconditional. A refusal is still news rather than a failure (`tx_bad_seq` and
+`tx_bad_minseq_age_or_gap` mean the owner moved, which is the mechanism working),
+but a package that was due and did not go out now turns the job red.
 
 ## Continuous integration
 

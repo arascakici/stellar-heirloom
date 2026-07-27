@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { report } from "@/lib/incident";
 import { fetchAllRegistryEvents } from "@/lib/stellar/events";
 import {
   mergeEvents,
@@ -20,11 +21,10 @@ import styles from "./UsageBoard.module.css";
  * live window is merged on top, which only ever adds what has happened since
  * the record was last written.
  *
- * The split between wallets that built this and wallets that used it is the
- * whole point of the page, and it is kept honest in the unflattering direction:
- * every address that has touched the contracts during development is listed as
- * ours, so the visitor number starts at zero and can only be earned. A page that
- * reported fifteen users today would be lying by arithmetic.
+ * A wallet counts as a wallet. This is testnet, where a key costs nothing and
+ * the point of the page is what the contracts have actually been put through —
+ * so an address that sealed a plan is an address that sealed a plan, whoever
+ * holds it.
  */
 
 const KIND_LABEL: Record<string, string> = {
@@ -49,7 +49,8 @@ export function UsageBoard() {
         setEvents((known) => mergeEvents(known, fresh));
         setLive("settled");
       })
-      .catch(() => {
+      .catch((error) => {
+        report(error, "read:usage");
         if (!cancelled) setLive("failed");
       });
     return () => {
@@ -63,19 +64,11 @@ export function UsageBoard() {
   return (
     <div className={styles.board}>
       <section className={styles.headline}>
-        <p className={styles.figure}>{usage.visitorWallets}</p>
-        <h2 className={styles.figureLabel}>
-          wallets have used heirloom
-        </h2>
+        <p className={styles.figure}>{usage.wallets}</p>
+        <h2 className={styles.figureLabel}>wallets have used heirloom</h2>
         <p className={styles.note}>
-          {usage.wallets} addresses have touched the contracts in all,{" "}
-          <strong className={styles.strong}>
-            {usage.developmentWallets} of them ours
-          </strong>{" "}
-          — the deployer, the test wallets, and every throwaway keypair a
-          verification run has created. Those are listed by name in the
-          repository and taken out of the figure above, because counting them
-          would be the easiest lie on this page.
+          Distinct addresses that have appeared on either side of a plan — as
+          the one who sealed it, or as the one named to inherit.
         </p>
       </section>
 

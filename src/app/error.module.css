@@ -1,0 +1,92 @@
+.page {
+  min-height: calc(100dvh - 3.75rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) var(--space-4);
+  background-image: radial-gradient(
+    120% 80% at 50% -10%,
+    var(--wood-700) 0%,
+    var(--surface) 55%,
+    var(--wood-950) 100%
+  );
+}
+
+.plate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 30rem;
+  padding: var(--space-6);
+  background-color: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lid), var(--shadow-inset);
+}
+
+/*
+ * Not rust. Rust means something in this app — irreversible, dangerous, done —
+ * and a page failing is none of those. Calling it in the same colour as a
+ * broken seal would frighten somebody about the wrong thing entirely.
+ */
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--parchment-100);
+}
+
+.body {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.retry {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  color: var(--accent-bright);
+  border: 1px solid var(--brass-600);
+  border-radius: var(--radius-sm);
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.retry:hover {
+  color: var(--wood-950);
+  background-color: var(--brass-400);
+}
+
+.away {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition:
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.away:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.digest {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}

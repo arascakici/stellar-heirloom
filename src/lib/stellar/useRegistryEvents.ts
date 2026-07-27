@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { report } from "../incident";
 import {
   concerns,
   fetchRegistryEvents,
@@ -72,7 +73,8 @@ export function useRegistryEvents({ address, onOwnEvent }: Options): FeedState {
           notify.current?.();
         }
       }
-    } catch {
+    } catch (error) {
+      report(error, "read:events");
       if (!cancelled()) {
         setError("Could not reach the registry.");
       }

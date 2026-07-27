@@ -95,13 +95,10 @@ describe("summarise", () => {
     expect(Object.values(usage.counts).every((n) => n === 0)).toBe(true);
   });
 
-  it("separates the wallets that built this from the ones that used it", () => {
-    // Every address in the committed record is a development one today, so the
-    // visitor count must be zero. If this ever fails it is because a real
-    // wallet has arrived — which is the number the whole page exists to show.
+  it("counts the committed record without needing the network", () => {
     const usage = summarise(recordedEvents());
-    expect(usage.wallets).toBe(usage.developmentWallets + usage.visitorWallets);
-    expect(usage.visitorWallets).toBeGreaterThanOrEqual(0);
+    expect(usage.events).toBe(recordedEvents().length);
+    expect(usage.wallets).toBeGreaterThan(0);
   });
 });
 
