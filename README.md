@@ -384,6 +384,52 @@ One trade-off left deliberately: fonts still use `display: swap` rather than
 and `optional` would buy it back by never swapping the face in at all. The
 typography is not decoration here, so the second is the cheaper thing to spend.
 
+## Contract cost and storage
+
+```bash
+npm run costs             # reads only, free, changes nothing
+npm run costs -- --writes # funds a throwaway account and measures the paying calls
+```
+
+Simulated against the live network, so the figures are today's fee schedule and
+today's rent rather than an estimate. The script tidies up after itself.
+
+| | instructions | write B | XLM |
+| --- | --- | --- | --- |
+| `register` | 927,879 | 540 | 0.0287 |
+| `seal` | 1,865,401 | 1,100 | 0.0365 |
+| `heartbeat` | 877,262 | 356 | 0.0018 |
+| `unseal` | 1,065,431 | 404 | 0.0021 |
+| `cancel` | 876,719 | 356 | 0.0021 |
+
+**Sealing a plan costs 0.065 XLM, and keeping it alive costs 0.0018 XLM a
+time.** Somebody who winds their clock monthly spends about two hundredths of a
+lumen a year to stay alive on the record. Reads cost nothing at all — they are
+simulations, so an heir checking what is waiting for them pays no fee and needs
+no funded account.
+
+The compiled contracts are 7.9 KB and 9.9 KB, already built with `opt-level =
+"z"`, fat LTO and symbols stripped. The largest thing stored is the signed
+takeover itself, at 296 bytes — and that is the product, not overhead. There was
+nothing here worth optimising, and inventing an optimisation to look busy would
+have been the wrong answer.
+
+What the measurement did turn up is a ceiling. The vault keeps one list of
+everyone holding a package and rewrites all of it on every seal. Sealing five
+plans in a row and watching the cost move gave the slope exactly: **44 bytes per
+owner**, and about 40 stroops — four ten-thousandths of a cent, which is why the
+fee column barely moves. The binding limit is not the fee but the size of a
+ledger entry, which this network caps at 65,536 bytes:
+
+> **the vault fills at about 1,489 packages.**
+
+Left as it is, deliberately. At that point `seal` stops accepting new packages
+while everything already sealed stays readable and claimable, and `unseal` keeps
+working because it writes a shorter list than it read — a closed door rather than
+a locked one. Splitting the list into pages is the fix when it is needed; doing
+it now would cost a redeploy and strand every package currently in the vault to
+solve a problem 1,488 plans away.
+
 ## Monitoring
 
 Nothing is shipped to anybody. An error tracker is where a privacy claim

@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "verify:preconditions": "node scripts/verify-preconditions.mjs",
     "watchtower": "node scripts/watchtower.mjs",
-    "usage:snapshot": "node scripts/usage-snapshot.mjs"
+    "usage:snapshot": "node scripts/usage-snapshot.mjs",
+    "costs": "node scripts/contract-costs.mjs"
   },
   "dependencies": {
     "@creit.tech/stellar-wallets-kit": "^2.5.0",
