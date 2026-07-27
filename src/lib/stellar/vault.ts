@@ -16,7 +16,7 @@ import type { TxOutcome } from "./outcome";
 /** The deployed vault. Override for a fresh deployment via env. */
 export const VAULT_ID =
   process.env.NEXT_PUBLIC_VAULT_ID ??
-  "CB55KTVZ7QINEKSXDTALKEIEJWW4DHLIGZPM4SANDG3UGF7XKDIPU7JQ";
+  "CANLQE764X2GHPCFHHDIBXPT35PATT2IIYRCFBK77O6EECKS3CPJDHPY";
 
 export type SealedEnvelope = {
   owner: string;
@@ -87,6 +87,18 @@ export async function getEnvelope(owner: string): Promise<SealedEnvelope | null>
  */
 export async function claimableFor(heir: string): Promise<string[]> {
   const raw = await read("claimable_for", heir, new Address(heir).toScVal());
+  return Array.isArray(raw) ? (raw as string[]) : [];
+}
+
+/**
+ * Everyone holding a package in the vault, collected or still waiting.
+ *
+ * The one question that does not need an address to ask it, and the reason the
+ * vault can be read rather than watched: what it holds is written down, so it
+ * does not matter whether anyone saw it arrive.
+ */
+export async function vaultOwners(source: string): Promise<string[]> {
+  const raw = await read("owners", source);
   return Array.isArray(raw) ? (raw as string[]) : [];
 }
 

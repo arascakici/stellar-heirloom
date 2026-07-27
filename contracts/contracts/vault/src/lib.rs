@@ -58,6 +58,20 @@ pub enum DataKey {
     Registry,
     /// owner -> Envelope
     Envelope(Address),
+    /// Every owner holding a package here, so the vault can be asked what it
+    /// contains instead of having to be watched as it fills.
+    ///
+    /// Without this, the only way to learn a package exists is to have seen the
+    /// `Sealed` event go by — and events are kept for about a week, while a
+    /// package is meant to wait for months. A courier that starts late, or
+    /// misses a run, could never catch up, and the package it could not see
+    /// would sit there due and undelivered. The list is the difference between
+    /// a promise that holds and one that holds only if somebody was watching.
+    ///
+    /// One entry that grows: a few hundred owners is comfortable, and every
+    /// seal rewrites the whole list, so this is the first thing that would need
+    /// splitting if the vault ever filled up.
+    Owners,
 }
 
 #[contracterror]
@@ -193,6 +207,15 @@ impl Vault {
             .persistent()
             .extend_ttl(&key, ENVELOPE_TTL, ENVELOPE_TTL);
 
+        let mut owners = Self::owners(env.clone());
+        if !owners.contains(&owner) {
+            owners.push_back(owner.clone());
+            env.storage().persistent().set(&DataKey::Owners, &owners);
+            env.storage()
+                .persistent()
+                .extend_ttl(&DataKey::Owners, ENVELOPE_TTL, ENVELOPE_TTL);
+        }
+
         Sealed {
             owner,
             heir,
@@ -218,6 +241,17 @@ impl Vault {
 
         env.storage().persistent().remove(&key);
 
+        // The list names what the vault holds, so it has to shrink with it —
+        // otherwise a courier keeps being sent after a package that is gone.
+        let mut owners = Self::owners(env.clone());
+        if let Some(at) = owners.first_index_of(&owner) {
+            owners.remove(at);
+            env.storage().persistent().set(&DataKey::Owners, &owners);
+            env.storage()
+                .persistent()
+                .extend_ttl(&DataKey::Owners, ENVELOPE_TTL, ENVELOPE_TTL);
+        }
+
         Unsealed {
             owner,
             heir: envelope.heir,
@@ -225,6 +259,20 @@ impl Vault {
         .publish(&env);
 
         Ok(())
+    }
+
+    /// Everyone holding a package here, claimed or still waiting.
+    ///
+    /// This is what makes delivery something anybody can run rather than
+    /// something only a watcher who was present at the sealing can run. Ask the
+    /// vault what it holds, ask the registry which of those silences have run
+    /// out, deliver those. No history to have kept, nothing to have subscribed
+    /// to in time.
+    pub fn owners(env: Env) -> Vec<Address> {
+        env.storage()
+            .persistent()
+            .get(&DataKey::Owners)
+            .unwrap_or_else(|| Vec::new(&env))
     }
 
     /// The package sealed for `owner`, if there is one.

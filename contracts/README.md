@@ -136,8 +136,18 @@ fails, the heir can still walk up and take it.
 | `unseal(owner)` | Take it back. Owner's authorization required. |
 | `claim(owner)` | Hand the package out, once it is due. **No authorization asked.** |
 | `envelope(owner)` | The package sealed for this owner, if any. |
+| `owners()` | Everyone holding a package here, collected or still waiting. |
 | `claimable_for(heir)` | The owners whose packages this heir may collect right now. |
 | `registry_address()` | The registry this vault asks about silences. |
+
+`owners()` is what makes delivery an errand anybody can run. Without it the only
+way to learn a package exists is to have watched its `Sealed` event go past, and
+events are kept for about a week while a package is written to wait for months —
+so a courier who started late could never catch up, and the package it could not
+see would sit there due and undelivered. Asking the vault what it holds removes
+the window: there is no history to have kept, and nothing to have subscribed to
+in time. The list is one entry that grows, and every seal rewrites all of it, so
+a few hundred owners is comfortable and past that it wants splitting into pages.
 
 `claim` takes nobody's signature deliberately. The transaction inside is already
 signed and the chain refuses it until it is due, so demanding a particular caller

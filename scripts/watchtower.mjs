@@ -39,14 +39,7 @@ const PASSPHRASE = process.env.NETWORK_PASSPHRASE ?? Networks.TESTNET
 const REGISTRY =
   process.env.REGISTRY_ID ?? 'CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU'
 const VAULT =
-  process.env.VAULT_ID ?? 'CDQIG5JQHNIBVVPO5G5JGHHG7HBDZJ2ZTAIRB3WR2RESYCVPP5G6CMGG'
-
-/**
- * Soroban RPC scans only a bounded stretch of ledgers per request — about five
- * thousand answers reliably, roughly seven hours at five seconds a ledger. An
- * hourly run therefore overlaps generously rather than skipping anything.
- */
-const LOOKBACK_LEDGERS = 5_000
+  process.env.VAULT_ID ?? 'CANLQE764X2GHPCFHHDIBXPT35PATT2IIYRCFBK77O6EECKS3CPJDHPY'
 
 const horizon = new Horizon.Server(HORIZON)
 const soroban = new rpc.Server(RPC)
@@ -74,40 +67,25 @@ async function read(contractId, method, source, ...args) {
   return sim.result?.retval ? scValToNative(sim.result.retval) : null
 }
 
-/** Every owner who has ever sealed a package, within the window RPC will scan. */
+/**
+ * Everyone holding a package, asked of the vault itself.
+ *
+ * This used to be assembled from `Sealed` events, and it was quietly broken.
+ * Events are kept for about a week and the scan reaches back only a few hours
+ * per request, while a package is written precisely so it can wait for months —
+ * so by the time one came due, the event announcing it was long gone and the
+ * watchtower saw nothing to deliver. It never failed; it just found an empty
+ * list every hour, which looks exactly like having nothing to do.
+ *
+ * The vault now keeps the list, so there is no window to fall outside of and no
+ * history a courier has to have been present for.
+ */
 async function sealedOwners() {
-  const latest = await soroban.getLatestLedger()
-  const startLedger = Math.max(latest.sequence - LOOKBACK_LEDGERS, 1)
-
-  const owners = new Set()
-  let cursor = null
-
-  for (let page = 0; page < 20; page += 1) {
-    const request = cursor
-      ? { cursor, filters: [{ type: 'contract', contractIds: [VAULT] }], limit: 100 }
-      : {
-          startLedger,
-          filters: [{ type: 'contract', contractIds: [VAULT] }],
-          limit: 100,
-        }
-
-    const response = await soroban.getEvents(request)
-    for (const event of response.events ?? []) {
-      try {
-        const topics = event.topic.map((t) => scValToNative(t))
-        if (topics[0] === 'sealed' && typeof topics[1] === 'string') {
-          owners.add(topics[1])
-        }
-      } catch {
-        // Not a shape we know; the next event may well be.
-      }
-    }
-
-    if (!response.events?.length || !response.cursor) break
-    cursor = response.cursor
-  }
-
-  return [...owners]
+  // A read is a simulation, so the source only has to be a well-formed account
+  // id — it is never charged and never has to exist. Asking about everybody
+  // means there is no subject address to borrow, so one is made up.
+  const owners = await read(VAULT, 'owners', Keypair.random().publicKey())
+  return Array.isArray(owners) ? owners : []
 }
 
 async function deliver(owner) {
@@ -181,7 +159,7 @@ async function main() {
   say(`watchtower — vault ${VAULT}`)
 
   const owners = await sealedOwners()
-  say(`${owners.length} account(s) have sealed a package in the scanned window`)
+  say(`the vault holds packages for ${owners.length} account(s)`)
 
   for (const owner of owners) {
     try {

@@ -3,7 +3,44 @@
 Testnet only. Newest first — earlier deployments stay listed, because the events
 they witnessed are still on chain and still readable at their addresses.
 
-## vault — 26 July 2026 (current)
+## vault — 27 July 2026 (current)
+
+The vault now keeps a list of every owner holding a package, and answers
+`owners()` with it.
+
+This was a repair, not a feature. Delivery is meant to be an errand anybody can
+run, but the watchtower could only learn a package existed by having seen its
+`Sealed` event go past — and events are kept for about a week, while a package is
+written precisely so it can wait for months. By the time a silence ran out, the
+announcement was long gone. The script never failed; it found an empty list every
+hour, which looks exactly like having nothing to do. A package sealed on 26 July
+was already due and already invisible.
+
+Asking the vault what it holds removes the window entirely. There is no history
+to have kept and nothing to have been subscribed to in time.
+
+| | |
+|---|---|
+| **Contract ID** | `CANLQE764X2GHPCFHHDIBXPT35PATT2IIYRCFBK77O6EECKS3CPJDHPY` |
+| **Registry** | `CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU` (unchanged) |
+| **Explorer** | [stellar.expert](https://stellar.expert/explorer/testnet/contract/CANLQE764X2GHPCFHHDIBXPT35PATT2IIYRCFBK77O6EECKS3CPJDHPY) |
+| **Deploy tx** | [`a28d7173…`](https://stellar.expert/explorer/testnet/tx/a28d7173fc4b2837a1de41b608e44ef6c05235f6fc12b1546b02019f54cc0aef) |
+
+Verified live, on throwaway accounts: a fresh vault names nobody; sealing adds
+the owner; sealing a second adds it alongside; unsealing the first removes that
+one and leaves the other; and a collected package stays listed, because the
+envelope is still there and dropping it would erase the record that it was ever
+delivered.
+
+Packages sealed into the previous vault stayed with it. There was one, belonging
+to a throwaway deployer account, and it is the package this repair was found
+through.
+
+One limit worth naming: the list is a single entry that grows, and every seal
+rewrites all of it. A few hundred owners is comfortable; past that it wants
+splitting into pages.
+
+## vault — 26 July 2026
 
 `Delivery` gained a third mode, `Joint`, so the vault was redeployed. The
 registry is unchanged and keeps its address, so the new vault was pointed at the

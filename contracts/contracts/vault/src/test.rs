@@ -290,3 +290,96 @@ fn an_heir_sees_only_their_own_due_packages() {
     assert_eq!(theirs.len(), 1);
     assert_eq!(theirs.get(0).unwrap(), someone_elses);
 }
+
+/// The list exists so that delivery does not depend on anybody having watched
+/// the vault fill up. These pin down that it says exactly what the vault holds.
+#[test]
+fn an_empty_vault_names_nobody() {
+    let w = world();
+    assert_eq!(w.vault.owners().len(), 0);
+}
+
+#[test]
+fn the_vault_names_everyone_holding_a_package() {
+    let w = world();
+    let first = Address::generate(&w.env);
+    let second = Address::generate(&w.env);
+    let heir = Address::generate(&w.env);
+    let tx = envelope_bytes(&w.env);
+
+    w.registry.register(&first, &heir, &500u64, &Mode::Standing);
+    w.registry
+        .register(&second, &heir, &500u64, &Mode::Standing);
+    w.vault.seal(&first, &heir, &Delivery::Handover, &tx);
+    w.vault.seal(&second, &heir, &Delivery::Joint, &tx);
+
+    let owners = w.vault.owners();
+    assert_eq!(owners.len(), 2);
+    assert!(owners.contains(&first));
+    assert!(owners.contains(&second));
+}
+
+#[test]
+fn taking_a_package_back_takes_its_owner_off_the_list() {
+    let w = world();
+    let leaving = Address::generate(&w.env);
+    let staying = Address::generate(&w.env);
+    let heir = Address::generate(&w.env);
+    let tx = envelope_bytes(&w.env);
+
+    w.registry
+        .register(&leaving, &heir, &500u64, &Mode::Standing);
+    w.registry
+        .register(&staying, &heir, &500u64, &Mode::Standing);
+    w.vault.seal(&leaving, &heir, &Delivery::Handover, &tx);
+    w.vault.seal(&staying, &heir, &Delivery::Handover, &tx);
+
+    w.vault.unseal(&leaving);
+
+    let owners = w.vault.owners();
+    assert_eq!(owners.len(), 1);
+    assert!(!owners.contains(&leaving));
+    // Removing one must not disturb the other — a naive remove-by-index would.
+    assert!(owners.contains(&staying));
+    assert!(w.vault.envelope(&staying).is_some());
+}
+
+#[test]
+fn a_collected_package_stays_on_the_list() {
+    let w = world();
+    let owner = Address::generate(&w.env);
+    let heir = Address::generate(&w.env);
+    let tx = envelope_bytes(&w.env);
+
+    w.env.ledger().set_timestamp(1_000);
+    w.registry.register(&owner, &heir, &500u64, &Mode::Standing);
+    w.vault.seal(&owner, &heir, &Delivery::Handover, &tx);
+
+    w.env.ledger().set_timestamp(1_600);
+    w.vault.claim(&owner);
+
+    // The envelope is still in storage, so the list still names it. A courier
+    // reads `claimed_at` and passes over it; dropping it here would instead
+    // erase the record that it was ever delivered.
+    let owners = w.vault.owners();
+    assert_eq!(owners.len(), 1);
+    assert!(owners.contains(&owner));
+    assert!(w.vault.envelope(&owner).unwrap().claimed_at.is_some());
+}
+
+#[test]
+fn sealing_again_after_taking_a_package_back_names_the_owner_once() {
+    let w = world();
+    let owner = Address::generate(&w.env);
+    let heir = Address::generate(&w.env);
+    let tx = envelope_bytes(&w.env);
+
+    w.registry.register(&owner, &heir, &500u64, &Mode::Standing);
+    w.vault.seal(&owner, &heir, &Delivery::Handover, &tx);
+    w.vault.unseal(&owner);
+    w.vault.seal(&owner, &heir, &Delivery::Joint, &tx);
+
+    let owners = w.vault.owners();
+    assert_eq!(owners.len(), 1);
+    assert!(owners.contains(&owner));
+}

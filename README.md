@@ -32,8 +32,8 @@ courier. The heir does not have to be watching. Nor does anyone else.
 
 | | registry | vault |
 | --- | --- | --- |
-| **Contract** | [`CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU`](https://stellar.expert/explorer/testnet/contract/CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU) | [`CB55KTVZ7QINEKSXDTALKEIEJWW4DHLIGZPM4SANDG3UGF7XKDIPU7JQ`](https://stellar.expert/explorer/testnet/contract/CB55KTVZ7QINEKSXDTALKEIEJWW4DHLIGZPM4SANDG3UGF7XKDIPU7JQ) |
-| **Deploy tx** | [`399e9ae4…`](https://stellar.expert/explorer/testnet/tx/399e9ae4119e16c39859b8505081853b1fcda7d655bf4485cce2877e6c88b684) | [`6089c78b…`](https://stellar.expert/explorer/testnet/tx/6089c78bcfe5a16e65b76f5da85ddf31ac00494024f5931904ea5acabc62fcd5) |
+| **Contract** | [`CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU`](https://stellar.expert/explorer/testnet/contract/CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU) | [`CANLQE764X2GHPCFHHDIBXPT35PATT2IIYRCFBK77O6EECKS3CPJDHPY`](https://stellar.expert/explorer/testnet/contract/CANLQE764X2GHPCFHHDIBXPT35PATT2IIYRCFBK77O6EECKS3CPJDHPY) |
+| **Deploy tx** | [`399e9ae4…`](https://stellar.expert/explorer/testnet/tx/399e9ae4119e16c39859b8505081853b1fcda7d655bf4485cce2877e6c88b684) | [`a28d7173…`](https://stellar.expert/explorer/testnet/tx/a28d7173fc4b2837a1de41b608e44ef6c05235f6fc12b1546b02019f54cc0aef) |
 | **A package collected** | — | [`28e66b92…`](https://stellar.expert/explorer/testnet/tx/28e66b92dff988a1777c8897f9eeb3a7af07f9460faef6a4913e2636fe321c66) |
 
 ### Features
@@ -82,8 +82,8 @@ courier. The heir does not have to be watching. Nor does anyone else.
   anything due to the network. Delivering a signed transaction needs no
   signature, so it cannot act early and cannot be trusted wrongly — and if it
   stops running, an heir loses nothing but the convenience.
-- **CI on every push** — formatting, clippy, 34 contract tests, a `wasm32v1-none`
-  build, then lint, 42 frontend tests and a production build. Deployment is a
+- **CI on every push** — formatting, clippy, 39 contract tests, a `wasm32v1-none`
+  build, then lint, 60 frontend tests and a production build. Deployment is a
   separate workflow that runs only by hand, only after a typed confirmation, and
   installs a checksum-pinned toolchain before it is shown a key.
 - **Three signatures, said out loud.** Sealing records the plan, signs the
@@ -283,7 +283,7 @@ cross-contract call is exercised rather than mocked:
 cargo test --manifest-path contracts/Cargo.toml
 ```
 
-Thirty-four checks, all passing.
+Thirty-nine checks, all passing.
 
 The frontend's chain logic is covered by Vitest — how a takeover transaction is
 built for each mode and delivery, how a period is phrased, and how the
