@@ -17,6 +17,87 @@ Built level-by-level for the **Stellar Builder Challenge**. One repository, one
 product — each belt adds a section here, and earlier levels stay in place as the
 README grows.
 
+## Level 4 — Green Belt
+
+The product stops being a demo. Everything that was true on paper at Level 3 —
+that a package waits, that anybody can deliver it, that nothing needs trusting —
+got measured, and two of those claims turned out to be false in practice. Both
+were silent. Neither would have surfaced without going looking.
+
+**The watchtower had never been able to work.** It found packages by watching
+`Sealed` events go past, and Soroban RPC keeps events for about a week — while a
+package is written precisely so it can wait for months. By the time a silence
+ran out, the announcement was long gone. It never errored; it found an empty list
+every hour, which is indistinguishable from having nothing to do. A package
+sealed on 26 July was already due and already invisible. The vault now keeps a
+list of what it holds and answers `owners()`, so there is no window to fall
+outside of — and a redeploy that fixed a second bug at the same time, a stale
+contract address in the script that had gone unnoticed since the previous
+deployment. Both are now pinned by a test that fails CI if the two ever disagree.
+
+**And the job could not report failure.** It exited zero whatever happened, so
+the one process whose silence looks exactly like success could never say
+otherwise. A refusal is still news rather than a failure — the owner moved,
+which is the mechanism working — but a package that was due and did not go out
+now turns the run red.
+
+| | registry | vault |
+| --- | --- | --- |
+| **Contract** | [`CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU`](https://stellar.expert/explorer/testnet/contract/CDWSKU743CENKIALSGUJRBUAAN5B5SBQG37XX2FSQO6XEXWXJA6VBEQU) | [`CANLQE764X2GHPCFHHDIBXPT35PATT2IIYRCFBK77O6EECKS3CPJDHPY`](https://stellar.expert/explorer/testnet/contract/CANLQE764X2GHPCFHHDIBXPT35PATT2IIYRCFBK77O6EECKS3CPJDHPY) |
+
+### What this level added
+
+- **[`/usage`](https://stellar-heirloom.vercel.app/usage) — usage counted from
+  the chain, with no tracker anywhere.** Measuring visitors by handing their
+  wallet addresses to a third party would contradict the only thing heirloom
+  claims. Every figure comes from the contracts' own events and every one can be
+  looked up. Because RPC forgets after a week, the record over all time lives in
+  the repository, in git, where each addition is dated and checkable.
+- **Feedback asked for in heirloom's own voice**, posted behind the scenes to a
+  form. A browser cannot post to Google Forms and read what came back, so the
+  one server route in the project makes the hop and reports something true
+  instead of guessing.
+- **Failures written down without writing down the person.** Account ids,
+  contract ids, hashes, envelopes and emails are stripped twice — once where the
+  error is caught and once on the server that records it, because that route is
+  reachable by anyone. A secret seed gets a placeholder loud enough that the log
+  is unreadable past it. Fifteen tests hold the line, against real generated
+  keys rather than strings that look like them.
+- **Measured before optimised.** The obvious suspect was the bundle; it turned
+  out blocking time was already zero, and shrinking the SDK would have been a
+  week for nothing. What the numbers pointed at instead was 200 KB of preloaded
+  fonts including a subset for glyphs no page renders, and a top bar that
+  resized on hydration and moved every page four pixels. Mobile 72–81 → 91–92,
+  layout shift to **zero**, desktop **100**.
+- **Contract cost, and where it runs out.** Sealing a plan costs 0.065 XLM and
+  keeping it alive 0.0018 XLM a time. Nothing was worth optimising — the largest
+  thing stored is the signed takeover itself, which is the product. What the
+  measurement did find is a ceiling: 44 bytes per owner, measured by sealing
+  five plans and watching the slope, against a 65,536-byte entry limit. The
+  vault fills at about 1,489 packages, and fails as a closed door rather than a
+  locked one.
+
+### Verified on chain
+
+| Claim | How it was shown |
+| --- | --- |
+| Empty ledger bounds change nothing | a takeover carrying them is still refused early for the silence (`tx_bad_minseq_age_or_gap`), and still lands once due ([`6993bf79…`](https://stellar.expert/explorer/testnet/tx/6993bf79412cb870404f901c0ce1f0c86996aa570b516cea3190984f29ec75e0)) |
+| The vault knows what it holds | empty list, one seal, two seals, then an unseal removing the right one and leaving the other |
+| A courier needs no history | watchtower found and delivered a package whose `Sealed` event was long outside the event window — `2 waiting · 2 due · 1 delivered` where the old code found none ([`963443da…`](https://stellar.expert/explorer/testnet/tx/963443dae5bdf7246285b45c58cff271c92756b9e6fef58ee8d261a7383866ce)) |
+| Joint delivery leaves nobody locked out | both keys at weight 1 against thresholds of 1, after a real takeover |
+| Costs are what the README says | simulated against the live network by `npm run costs`, which anybody can run again |
+
+### Screenshots
+
+<!-- TODO: three images, per the Level 4 checklist.
+     l4-usage.png    — /usage, the count read off the chain
+     l4-mobile.png   — the product on a phone
+     l4-incident.png — a redacted [incident] line in the deployment's logs -->
+
+### Demo
+
+<!-- TODO: link the walkthrough video. -->
+
 ## Level 3 — Orange Belt
 
 The plan learns to arrive. Until now heirloom could record who inherits what and
@@ -83,7 +164,7 @@ courier. The heir does not have to be watching. Nor does anyone else.
   signature, so it cannot act early and cannot be trusted wrongly — and if it
   stops running, an heir loses nothing but the convenience.
 - **CI on every push** — formatting, clippy, 39 contract tests, a `wasm32v1-none`
-  build, then lint, 88 frontend tests and a production build. Deployment is a
+  build, then lint, 91 frontend tests and a production build. Deployment is a
   separate workflow that runs only by hand, only after a typed confirmation, and
   installs a checksum-pinned toolchain before it is shown a key.
 - **Three signatures, said out loud.** Sealing records the plan, signs the
@@ -294,7 +375,7 @@ npm test          # once
 npm run test:watch
 ```
 
-Eighty-eight checks. The event tests rebuild genuine `ScVal`s rather than
+Ninety-one checks. The event tests rebuild genuine `ScVal`s rather than
 mocking the decoder's input, so a change in how the contract publishes would
 fail them rather than slip past.
 
