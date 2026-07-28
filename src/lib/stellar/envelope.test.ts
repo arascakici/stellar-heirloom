@@ -211,3 +211,37 @@ describe("the envelope as a whole", () => {
     expect(restored.operations[0].type).toBe(tx.operations[0].type);
   });
 });
+
+describe("what a takeover looks like to a reader", () => {
+  it("carries ledger bounds, present and empty", () => {
+    // Present, so a viewer that reads the field without checking finds an
+    // object instead of undefined — which is what crashed stellar.expert on
+    // every takeover receipt. Empty, so it constrains nothing: zero means no
+    // first ledger and zero means no last one.
+    for (const mode of [PlanMode.Standing, PlanMode.Sealed]) {
+      const bounds = build({ mode }).ledgerBounds;
+      expect(bounds).toBeDefined();
+      expect(bounds?.minLedger).toBe(0);
+      expect(bounds?.maxLedger).toBe(0);
+    }
+  });
+
+  it("still refuses to expire", () => {
+    // The bounds above must not have quietly introduced a deadline: a plan that
+    // timed out would stop protecting anybody without telling them.
+    const tx = build();
+    expect(tx.timeBounds?.maxTime).toBe("0");
+  });
+
+  it("survives a round trip through XDR with its preconditions intact", () => {
+    const original = build({ mode: PlanMode.Standing });
+    const back = TransactionBuilder.fromXDR(
+      original.toXDR(),
+      network.passphrase,
+    ) as typeof original;
+
+    expect(back.ledgerBounds?.maxLedger).toBe(0);
+    expect(back.minAccountSequenceAge).toBe(THIRTY_DAYS);
+    expect(back.minAccountSequence).toBe(SEQUENCE.toString());
+  });
+});

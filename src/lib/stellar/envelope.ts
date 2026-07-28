@@ -101,6 +101,24 @@ export function buildEnvelope({
   })
     .addOperation(operationFor(delivery, heir))
     .setMinAccountSequenceAge(period)
+    /*
+     * Present but empty, which means the same as absent — no first ledger and
+     * no last one. It is here because stellar.expert cannot render a takeover
+     * without it: the preconditions we set put the transaction in the V2 shape,
+     * where ledger bounds are optional, and their viewer reads the field
+     * without checking, so clicking through to a receipt showed a crash instead
+     * of a transaction.
+     *
+     * Working around somebody else's missing null check is not obviously our
+     * job, but the alternative is every heir who follows the link seeing an
+     * error page about the most consequential thing this app does. Eight bytes.
+     *
+     * Proved on testnet before it was believed: with these bounds set, a
+     * takeover submitted too early is still refused for the silence
+     * (`tx_bad_minseq_age_or_gap`) rather than the bounds, and the same
+     * transaction still lands once the wait is done.
+     */
+    .setLedgerbounds(0, 0)
     // No expiry. A plan that timed out would be a plan that quietly stopped
     // protecting anyone, and nobody would be told.
     .setTimeout(0);

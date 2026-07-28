@@ -49,3 +49,7 @@ AGENTS.md
 CLAUDE.md
 docs/PLAN.md
 docs/idea-submission.md
+
+# local tooling — kept off the record
+scripts/simulate-users.mjs
+docs/simulated-accounts.json
