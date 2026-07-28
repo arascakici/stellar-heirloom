@@ -93,10 +93,6 @@ now turns the run red.
 | --- | --- |
 | ![The usage page: wallets, plans recorded, clocks wound, seals broken, packages left and taken back — every figure derived from the two contracts' own events](docs/screenshots/l4-usage.png) | ![Lighthouse on mobile: performance 90, accessibility 96, best practices 100, SEO 100](docs/screenshots/l4-lighthouse.png) |
 
-### Demo
-
-<!-- TODO: link the walkthrough video. -->
-
 ## Level 3 — Orange Belt
 
 The plan learns to arrive. Until now heirloom could record who inherits what and
