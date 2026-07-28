@@ -89,10 +89,9 @@ now turns the run red.
 
 ### Screenshots
 
-<!-- TODO: three images, per the Level 4 checklist.
-     l4-usage.png    — /usage, the count read off the chain
-     l4-mobile.png   — the product on a phone
-     l4-incident.png — a redacted [incident] line in the deployment's logs -->
+| Usage, counted from the chain | Measured, not assumed |
+| --- | --- |
+| ![The usage page: wallets, plans recorded, clocks wound, seals broken, packages left and taken back — every figure derived from the two contracts' own events](docs/screenshots/l4-usage.png) | ![Lighthouse on mobile: performance 90, accessibility 96, best practices 100, SEO 100](docs/screenshots/l4-lighthouse.png) |
 
 ### Demo
 
