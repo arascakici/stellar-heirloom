@@ -13,6 +13,8 @@ wallet you set aside takes over.
 
 **Live demo:** [stellar-heirloom.vercel.app](https://stellar-heirloom.vercel.app)
 
+**Demo video:** [Watch the walkthrough](https://www.youtube.com/watch?v=pTTquJz5Yu0)
+
 Built level-by-level for the **Stellar Builder Challenge**. One repository, one
 product — each belt adds a section here, and earlier levels stay in place as the
 README grows.
